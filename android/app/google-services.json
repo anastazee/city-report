@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "781909190909",
+    "project_id": "city-report-app",
+    "storage_bucket": "city-report-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781909190909:android:3d3bfcba13844aa9607694",
+        "android_client_info": {
+          "package_name": "com.example.city_report"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHSMiQYcbxTjeqo5A9UdejOsbMqaXY45A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
