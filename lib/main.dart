@@ -13,6 +13,8 @@ void main() async {
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
+
+  
   runApp(MyApp());
 }
 
