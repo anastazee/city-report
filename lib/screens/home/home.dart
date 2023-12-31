@@ -2,6 +2,7 @@ import 'package:flutter_application_1/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../authenticate/login.dart';
 import '../new_incident/new_incident.dart';
+import '../map/mappage.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -57,6 +58,28 @@ class _Home extends State<Home> {
         ),
       ),
     );
+  final ViewMap = Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(30.0),
+      color: Theme.of(context).primaryColor,
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () async {
+           await _auth.signOut();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MapPage()),
+            );
+        },
+        child: Text(
+          "Go to Map",
+          style: TextStyle(color: Theme.of(context).primaryColorLight),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
 
     return Scaffold(
       appBar: AppBar(
@@ -70,6 +93,8 @@ class _Home extends State<Home> {
             SignOut,
             const SizedBox(height: 20.0),
             AddIncident,
+            const SizedBox(height : 20.0),
+            ViewMap,
           ],
         ),
       ),
