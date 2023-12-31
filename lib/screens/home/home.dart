@@ -2,6 +2,8 @@ import 'package:flutter_application_1/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../authenticate/login.dart';
 import '../map/mappage.dart';
+import '../new_incident/new_incident.dart';
+
 
 class Home extends StatefulWidget{
   @override
@@ -33,6 +35,27 @@ class _Home extends State<Home>{
         },
         child: Text(
           "Log out",
+          style: TextStyle(color: Theme.of(context).primaryColorLight),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+ final AddIncident = Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(30.0),
+      color: Theme.of(context).primaryColor,
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewIncident()),
+          );
+        },
+        child: Text(
+          "Add Incident",
           style: TextStyle(color: Theme.of(context).primaryColorLight),
           textAlign: TextAlign.center,
         ),
@@ -74,6 +97,8 @@ final viewMap = Material(
             SignOut,
             SizedBox(height: 20.0), // Add some spacing between buttons
             viewMap,
+            SizedBox(height: 20.0),
+            AddIncident,
           ],
         ),
       ),
