@@ -58,7 +58,8 @@ class _Home extends State<Home> {
         ),
       ),
     );
-  final ViewMap = Material(
+
+    final ViewMap = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
       color: Theme.of(context).primaryColor,
@@ -66,11 +67,11 @@ class _Home extends State<Home> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-           await _auth.signOut();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => MapPage()),
-            );
+          await _auth.signOut();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MapPage()),
+          );
         },
         child: Text(
           "Go to Map",
@@ -79,7 +80,6 @@ class _Home extends State<Home> {
         ),
       ),
     );
-
 
     return Scaffold(
       appBar: AppBar(
@@ -93,7 +93,7 @@ class _Home extends State<Home> {
             SignOut,
             const SizedBox(height: 20.0),
             AddIncident,
-            const SizedBox(height : 20.0),
+            const SizedBox(height: 20.0),
             ViewMap,
           ],
         ),
