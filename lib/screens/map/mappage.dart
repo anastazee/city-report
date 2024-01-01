@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
+import '../view_incident/incident_details.dart';
 import '../../models/location_model.dart';
 
 class MapPage extends StatefulWidget {
@@ -160,6 +161,7 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
+
     );
   }
 }
@@ -177,7 +179,7 @@ class Markers extends StatelessWidget {
     print("mark prob");
 
     List<Marker> markers = [];
-
+    
     // Add markers for each location in the list
     locations.forEach((location) {
       markers.add(
@@ -186,9 +188,15 @@ class Markers extends StatelessWidget {
           child: GestureDetector(
             onTap: () {
               // Navigate to the placeholder page on short tap
-              Navigator.push(
+              /*Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Placeholder()),
+              );*/
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => IncidentDetails(documentId: location.documentId ?? ""),
+              ),
               );
               print(location.documentId);
             },
