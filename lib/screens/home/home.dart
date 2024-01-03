@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../authenticate/login.dart';
 import '../new_incident/new_incident.dart';
 import '../map/mappage.dart';
-
+import '../myposts.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -69,11 +69,10 @@ class _Home extends State<Home> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-          await _auth.signOut();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MapPage()),
-          );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MapPage()),
+    );
         },
         child: Text(
           "Go to Map",
@@ -82,6 +81,28 @@ class _Home extends State<Home> {
         ),
       ),
     );
+
+    final myPosts = Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(30.0),
+      color: Theme.of(context).primaryColor,
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyPosts()),
+    );
+        },
+        child: Text(
+          "See my Posts",
+          style: TextStyle(color: Theme.of(context).primaryColorLight),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
 
     return Scaffold(
       appBar: MyAppBar(),
@@ -94,6 +115,8 @@ class _Home extends State<Home> {
             AddIncident,
             const SizedBox(height: 20.0),
             ViewMap,
+            const SizedBox(height: 20.0),
+            myPosts,
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '/screens/all_incidents.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -6,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 import '../view_incident/incident_details.dart';
 import '../../models/location_model.dart';
-
+import '../home/home.dart';
 class MapPage extends StatefulWidget {
   @override
   _MapPageState createState() => _MapPageState();
@@ -157,6 +158,34 @@ class _MapPageState extends State<MapPage> {
                 getCurrentLocation();
               },
               child: Text('Get Location'),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => AllIncidents(),
+              ),
+              );
+              },
+              child: Text('Show All'),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => Home(),
+              ),
+              );
+              },
+              child: Text('Home'),
             ),
           ),
         ],
