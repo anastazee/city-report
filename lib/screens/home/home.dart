@@ -1,8 +1,10 @@
+import 'package:flutter_application_1/models/bars.dart';
 import 'package:flutter_application_1/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../authenticate/login.dart';
 import '../new_incident/new_incident.dart';
 import '../map/mappage.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -25,7 +27,7 @@ class _Home extends State<Home> {
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
           await _auth.signOut();
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Login()),
           );
@@ -82,10 +84,7 @@ class _Home extends State<Home> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Demo App - HomePage'),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: MyAppBar(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

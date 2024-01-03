@@ -33,11 +33,11 @@ class MyApp extends StatelessWidget{
           colorScheme:
               Theme.of(context).colorScheme.copyWith(secondary: Colors.white),
         ),
-        fontFamily: 'Georgia',
+        fontFamily: 'Inter',
         textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          titleLarge: TextStyle(fontSize: 20.0, fontStyle: FontStyle.italic),
-          bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+          titleLarge: TextStyle(fontSize: 20.0, fontStyle: FontStyle.normal),
+          bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Inter'),
         ),
         ),
       home: Wrapper(),
