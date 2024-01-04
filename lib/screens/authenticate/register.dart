@@ -104,21 +104,42 @@ class _Register extends State<Register>{
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-              dynamic result = await _auth.registerUser(LoginUser(username: _username.text, email: _email.text,password: _password.text));
-               if (result.uid == null) { //null means unsuccessfull authentication
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: Text(result.code),
-                      );
-                    });
+            bool isUsernameTaken = await isUsernameAlreadyTaken(_username.text);
+
+          if (isUsernameTaken) {
+            // Display an error message to the user
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Username is already taken. Please choose a different one.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          else {
+            dynamic result = await _auth.registerUser(LoginUser(username: _username.text, email: _email.text,password: _password.text));
+            if (result.uid == null) { //null means unsuccessfull authentication
+              showDialog(
+                context: context,
+                builder: (context) {
+                return AlertDialog(
+                content: Text(result.code),
+                );
+                });
+            }
+            else {
+              ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Registration completed succcessfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            }
           }
           }
         },
         child: Text(
-          "Register",
-          style: TextStyle(color: Theme.of(context).primaryColorLight),
+          "Create Account",
+          style: TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
@@ -129,12 +150,18 @@ class _Register extends State<Register>{
    return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-          title: const Text('Registration Demo Page'),
-          backgroundColor: Theme.of(context).primaryColor,
+          title: const Text('City Report', textAlign: TextAlign.center,),
+          centerTitle: true,
+          backgroundColor: Color.fromARGB(255, 227, 186, 220),
         ),
         body: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const Text(
+          "Welcome!\n You can create your account right below!", textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,),
+            ),
         Form(
           autovalidateMode: AutovalidateMode.always,
           key: _formKey,
@@ -144,16 +171,15 @@ class _Register extends State<Register>{
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const SizedBox(height: 45.0),
-                emailField,
-                const SizedBox(height: 45.0),
                 usernameField,
                 const SizedBox(height: 25.0),
                 passwordField,
                 const SizedBox(height: 25.0),
-                txtbutton,
-                const SizedBox( height: 35.0),
+                emailField,
+                const SizedBox(height: 25.0),
                 registerButton,
+                const SizedBox( height: 35.0),
+                txtbutton,
                 const SizedBox(height: 15.0),
               ],
             ),

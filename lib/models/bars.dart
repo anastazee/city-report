@@ -17,7 +17,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       title: Text('City Report'),
       centerTitle: true,
-      backgroundColor: Color.fromARGB(255, 227, 186, 220),
+      backgroundColor: Color.fromARGB(255, 233, 190, 226),
       actions: [
         IconButton(
            icon: Icon(Icons.email_outlined),

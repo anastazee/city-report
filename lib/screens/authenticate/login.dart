@@ -69,15 +69,21 @@ class _Login extends State<Login> {
               borderRadius: BorderRadius.circular(32.0),
             )));
 
-final txtbutton = TextButton(
-  onPressed: () {
+    final register = Material(
+      elevation: 0.0,
+      borderRadius: BorderRadius.circular(5.0),
+      color: Color.fromARGB(255, 227, 186, 220),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width * 0.1, // Adjust the factor to your liking
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 7.0),
+        onPressed: () {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Register()), // Replace Register() with the actual Register widget
     );
   },
-  child: const Text('New? Register here'),
-);
+  child: const Text('Register here'),
+));
 
     
     final loginButton = Material(
@@ -109,7 +115,7 @@ final txtbutton = TextButton(
 },
         child: Text(
           "Log in",
-          style: TextStyle(color: Theme.of(context).primaryColorLight),
+          style: TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
@@ -117,13 +123,31 @@ final txtbutton = TextButton(
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('Login Demo Page'),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 25.0),
+        Container(
+        color: Color.fromARGB(255, 228, 174, 219), // Set the desired color for the box
+        padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 30.0), // Add top padding
+        child: Text(
+          'City \nReport',
+          style: TextStyle(
+            color: Colors.black, // Set the text color
+            fontSize: 36.0,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+      ),
+      SizedBox(height: 20.0),
+    Text(
+      'Log In',
+            style: TextStyle(
+            color: Colors.black, // Set the text color
+            fontSize: 20.0,
+            fontWeight: FontWeight.normal,
+          ),
+          ),
           Form(
             key: _formKey,
             child: Padding(
@@ -135,14 +159,30 @@ final txtbutton = TextButton(
                   emailField,
                   const SizedBox(height: 25.0),
                   passwordField,
-                  txtbutton,
-                  const SizedBox(height: 35.0),
+                  const SizedBox(height: 25.0),
                   loginButton,
                   const SizedBox(height: 15.0),
                 ],
               ),
             ),
           ),
+          Spacer(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Don't have an account ?",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16.0,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+            SizedBox(width: 20.0),
+            register,
+          ],
+        ),
+        const SizedBox(height: 25.0),
         ],
       ),
     );

@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget{
        child: MaterialApp(
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: Colors.black,
+        primaryColor: Color(0xFF6750A4),
         buttonTheme: ButtonThemeData(
-          buttonColor: Colors.black,
+          buttonColor: Color(0xFF6750A4),
           textTheme: ButtonTextTheme.primary,
           colorScheme:
               Theme.of(context).colorScheme.copyWith(secondary: Colors.white),
