@@ -6,6 +6,8 @@ class IncidentDetails {
   final GeoPoint? location;
   final String? title;
   final String? username;
+  final int? likes;
+  final int? dislikes;
 
   IncidentDetails({
     this.datetime,
@@ -13,5 +15,7 @@ class IncidentDetails {
     this.location,
     this.title,
     this.username,
+    this.likes,
+    this.dislikes,
   });
 }

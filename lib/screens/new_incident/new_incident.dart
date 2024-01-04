@@ -117,6 +117,8 @@ class _NewIncidentState extends State<NewIncident> {
                       'location': incidentDetails.location,
                       'title': incidentDetails.title,
                       'username': incidentDetails.username,
+                      'likes': 0,
+                      'dislikes': 0,
                     });
                   }
                 },
