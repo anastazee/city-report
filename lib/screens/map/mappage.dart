@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:geocoding/geocoding.dart';
+import 'package:flutter/services.dart';
 
 
 import '../view_incident/incident_details.dart';
@@ -30,7 +31,7 @@ class _MapPageState extends State<MapPage> {
 
   void loadIncidents() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('incidents').get();
+        await FirebaseFirestore.instance.collection('recent').get();
     List<LocationModel> locations = [];
 
     snapshot.docs.forEach((doc) {
@@ -119,35 +120,48 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-      void searchLocation(String query) async {
-    try {
-      List<Location> locationssearch = await locationFromAddress(query);
 
-      if (locationssearch.isNotEmpty) {
-        Location location = locationssearch.first;
-        mapController.move(
-          LatLng(location.latitude, location.longitude),
-          15.0,
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Location Not Found'),
-            content: Text('The specified location could not be found.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error searching location: $e');
+
+void searchLocation(String query) async {
+  try {
+    List<Location> locationsSearch = await locationFromAddress(query);
+
+    if (locationsSearch.isNotEmpty) {
+      Location location = locationsSearch.first;
+      mapController.move(
+        LatLng(location.latitude, location.longitude),
+        15.0,
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Location Not Found'),
+          content: Text('The specified location could not be found.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
+  } on PlatformException catch (e, _) {
+    if (e.code == 'NOT_FOUND') {
+      // Handle case where no coordinates are found
+      print('Location not found for: $query');
+    } else {
+      // Handle other platform exceptions
+      print('Platform exception: $e');
+    }
+  } catch (e) {
+    // Handle other exceptions
+    print('Error searching location: $e');
   }
+}
+
+
 
 @override
 Widget build(BuildContext context) {
@@ -161,8 +175,8 @@ Widget build(BuildContext context) {
           mapController: mapController,
           options: MapOptions(
             initialCenter: LatLng(
-              currentLocation?.latitude ?? 0.0,
-              currentLocation?.longitude ?? 0.0,
+              currentLocation?.latitude ?? 37.97967606756956,
+              currentLocation?.longitude ?? 23.783193788361352,
             ),
             initialZoom: 15.0,
           ),

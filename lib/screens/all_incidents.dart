@@ -108,7 +108,7 @@ Future<void> getUserLocation() async {
       body: Stack(
         children: [
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('incidents').snapshots(),
+            stream: FirebaseFirestore.instance.collection('recent').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                   return Center(

@@ -110,7 +110,7 @@ class _NewIncidentState extends State<NewIncident> {
                     );
 
                     await FirebaseFirestore.instance
-                        .collection('incidents')
+                        .collection('recent')
                         .add({
                       'datetime': incidentDetails.datetime,
                       'description': incidentDetails.description,

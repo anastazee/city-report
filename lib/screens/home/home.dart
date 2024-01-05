@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../authenticate/login.dart';
 import '../new_incident/new_incident.dart';
 import '../map/mappage.dart';
-import '../myposts.dart';
+import '../myposts2.dart';
 
 class Home extends StatefulWidget {
   @override
