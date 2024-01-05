@@ -158,7 +158,7 @@ Future<void> getUserLocation() async {
                       if (sortByProximity) {
                         var geopoint = data['location'] as GeoPoint?;
                         var incidentLocation =
-                            geopoint != null ? Location(geopoint.latitude, geopoint.longitude) : null;
+                            geopoint != null ? Location1(geopoint.latitude, geopoint.longitude) : null;
 
                         // Handle cases where location is null
                         if (incidentLocation != null) {
@@ -273,10 +273,10 @@ Future<void> getUserLocation() async {
     if (userLocation != null) {
       incidents.sort((a, b) {
         var geopointA = (a['location'] as GeoPoint?);
-        var incidentLocationA = geopointA != null ? Location(geopointA.latitude, geopointA.longitude) : null;
+        var incidentLocationA = geopointA != null ? Location1(geopointA.latitude, geopointA.longitude) : null;
 
         var geopointB = (b['location'] as GeoPoint?);
-        var incidentLocationB = geopointB != null ? Location(geopointB.latitude, geopointB.longitude) : null;
+        var incidentLocationB = geopointB != null ? Location1(geopointB.latitude, geopointB.longitude) : null;
 
         // Handle cases where location is null
         if (incidentLocationA == null && incidentLocationB == null) {
@@ -309,9 +309,9 @@ Future<void> getUserLocation() async {
   }
 }
 
-class Location {
+class Location1 {
   final double latitude;
   final double longitude;
 
-  Location(this.latitude, this.longitude);
+  Location1(this.latitude, this.longitude);
 }

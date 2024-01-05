@@ -43,6 +43,7 @@ dependencies:
   geolocator: 10.1.0
   location: 5.0.0
   intl: ^0.17.0
+  geocoding: ^2.1.1
 
 
 dev_dependencies:

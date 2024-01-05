@@ -4,6 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:geocoding/geocoding.dart';
+
 
 import '../view_incident/incident_details.dart';
 import '../../models/location_model.dart';
@@ -16,14 +18,14 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   late MapController mapController;
   LocationModel? currentLocation;
-  List<LocationModel> incidentLocations =
-      []; // List to store incident locations
+  List<LocationModel> incidentLocations = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
-    loadIncidents();
+    //loadIncidents();
   }
 
   void loadIncidents() async {
@@ -53,6 +55,11 @@ class _MapPageState extends State<MapPage> {
       incidentLocations = locations;
     });
   }
+
+
+
+
+
 
   void getCurrentLocation() async {
     loadIncidents();
@@ -112,88 +119,210 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    print("wtf");
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Map Demo'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FlutterMap(
-              mapController: mapController,
-              options: MapOptions(
-                initialCenter: LatLng(
-                  currentLocation?.latitude ?? 0.0,
-                  currentLocation?.longitude ?? 0.0,
-                ),
-                initialZoom: 15.0,
+      void searchLocation(String query) async {
+    try {
+      List<Location> locationssearch = await locationFromAddress(query);
+
+      if (locationssearch.isNotEmpty) {
+        Location location = locationssearch.first;
+        mapController.move(
+          LatLng(location.latitude, location.longitude),
+          15.0,
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Location Not Found'),
+            content: Text('The specified location could not be found.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                ),
-                Markers(locations: incidentLocations),
-                MarkerLayer(
-                  markers: [
-                    if (currentLocation != null) // Add null check
-                      Marker(
-                        point: LatLng(
-                          currentLocation!.latitude,
-                          currentLocation!.longitude,
-                        ),
-                        child: Icon(Icons.location_on, color: Colors.red),
-                      ),
-                  ],
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error searching location: $e');
+    }
+  }
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Flutter Map Demo'),
+    ),
+    body: Stack(
+      children: [
+        FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+            initialCenter: LatLng(
+              currentLocation?.latitude ?? 0.0,
+              currentLocation?.longitude ?? 0.0,
+            ),
+            initialZoom: 15.0,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            ),
+            Markers(locations: incidentLocations),
+            MarkerLayer(
+  markers: [
+    if (currentLocation != null)
+      Marker(
+        point: LatLng(
+          currentLocation!.latitude,
+          currentLocation!.longitude,
+        ),
+        width: 15.0,
+        height: 15.0,
+        child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF6750A4), // Color of the Show All button
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF6750A4).withOpacity(0.8),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
                 ),
               ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                getCurrentLocation();
-              },
-              child: Text('Get Location'),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(
-                builder: (context) => AllIncidents(),
-              ),
-              );
-              },
-              child: Text('Show All'),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(
+      ),
+  ],
+),
+
+          ],
+        ),        Positioned(
+  bottom: 34.0,
+  right: 28.0,
+  child: RawMaterialButton(
+    onPressed: () {
+      // Clear the search bar when the button is tapped
+      searchController.clear();
+      // Perform other actions if needed
+      getCurrentLocation();
+    },
+    elevation: 0,
+    shape: CircleBorder(),
+    fillColor: Color(0xFFE8DEF8).withOpacity(0.8), // Adjust the opacity as needed
+    padding: EdgeInsets.all(12.0),
+    child: Icon(Icons.my_location, size: 46.0), // Adjust the size as needed
+  ),
+),
+
+        Positioned(
+          bottom: 90.0,
+          left: 28.0,
+          child: FloatingActionButton(
+            onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
                 builder: (context) => Home(),
               ),
-              );
+            );
+            },
+child: Icon(Icons.home),          ),
+        ),
+
+        Positioned(
+          bottom: 34.0,
+          left: 28.0,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AllIncidents(),
+                  ),
+                );
               },
-              child: Text('Home'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+                backgroundColor: Color(0xFF6750A4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+              child: Text(
+                'Show All',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.0,
+                ),
+              ),
             ),
           ),
-        ],
-      ),
-
-    );
-  }
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Container(
+              width: 256.0,
+              height: 39.0,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1.0,
+                  color: Color(0xFFCCC2DC),
+                ),
+                borderRadius: BorderRadius.circular(30.0),
+                color: Color(0xFFCCC2DC).withOpacity(0.8),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 10.0,
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: TextField(
+                  controller: searchController,
+                  onSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      searchLocation(value);
+                    }
+                  },
+                  style: TextStyle(fontSize: 14.0),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(top: 2.0),
+                    hintText: 'Search for a location...',
+                    border: InputBorder.none,
+                    prefixIcon: IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        if (searchController.text.isNotEmpty) {
+                          searchLocation(searchController.text);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+   
+  );
 }
+
+
+}
+
+
 
 class Markers extends StatelessWidget {
   Markers({
@@ -234,7 +363,7 @@ class Markers extends StatelessWidget {
             //showTextLabel(context);
 
             //},
-            child: Icon(Icons.location_on),
+            child: Icon(Icons.error, color:Color(0xFFB3261E)),
           ),
         ),
       );
@@ -243,3 +372,5 @@ class Markers extends StatelessWidget {
     return MarkerLayer(markers: markers);
   }
 }
+
+
