@@ -1,122 +1,9 @@
-/*import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-class IncidentDetailsScreen extends StatelessWidget {
-  final String documentId;
-
-  IncidentDetailsScreen({required this.documentId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Incident Details'),
-      ),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance.collection('incidents').doc(documentId).get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          }
-
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-
-          // Extract incident details from snapshot
-          var incidentData = snapshot.data?.data();
-
-          // Convert Timestamp to DateTime
-          DateTime datetime = incidentData?['datetime']?.toDate() ?? DateTime.now();
-
-          // Format DateTime as a string
-          String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(datetime);
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Title: ${incidentData?['title']}'),
-                Text('Date and Time: $formattedDateTime'),
-                Text('Location: ${incidentData?['location']}'),
-                Text('Username: ${incidentData?['username']}'),
-                Text('Description: ${incidentData?['description']}'),
-                // Add more details as needed
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-*/
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-/*
-class IncidentDetails extends StatelessWidget {
-  final String documentId;
-
-  IncidentDetails({required this.documentId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Incident Details'),
-      ),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance.collection('incidents').doc(documentId).get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          // Extract incident details from snapshot
-          var incidentData = snapshot.data?.data();
-
-          // Convert Timestamp to DateTime
-          DateTime datetime = incidentData?['datetime']?.toDate() ?? DateTime.now();
-
-          // Format DateTime as a string
-          String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(datetime);
-
-          // Extract latitude and longitude from GeoPoint
-          String locationString = incidentData?['location'] != null
-              ? 'Latitude: ${incidentData!['location'].latitude.toStringAsFixed(4)}, Longitude: ${incidentData['location'].longitude.toStringAsFixed(4)}'
-              : 'N/A';
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (incidentData?['title'] != null) Text('Title: ${incidentData!['title']}'),
-                if (incidentData?['datetime'] != null) Text('Date and Time: $formattedDateTime'),
-                if (incidentData?['location'] != null) Text('Location: $locationString'),
-                if (incidentData?['username'] != null) Text('Username: @${incidentData!['username']}'),
-                if (incidentData?['description'] != null) ...[
-                  Text('Description:'),
-                  Text(incidentData!['description']),
-                ],
-                // Add more details as needed
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-*/
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/services/queries.dart';
+import 'package:flutter_application_1/models/votes.dart';
 
 class IncidentDetails extends StatefulWidget {
   final String documentId;
@@ -128,8 +15,48 @@ class IncidentDetails extends StatefulWidget {
 }
 
 class _IncidentDetailsState extends State<IncidentDetails> {
+  User? user = FirebaseAuth.instance.currentUser;
+  String? _currentUsername;
+  bool? likePressed;
+  bool? dislikePressed;
+
   int likes = 0;
   int dislikes = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUsername();
+  }
+
+  _getCurrentUsername() async {
+    try {
+      String? currentUsername = await getUsernameFromEmail(user?.email ?? '');
+      setState(() {
+        _currentUsername = currentUsername;
+        _checkUserVote();
+      });
+    } catch (e) {
+      print('Error getting username: $e');
+    }
+  }
+
+  _checkUserVote() async {
+    try {
+      VoteDetails? userVote = await getUserVote();
+      if (userVote != null) {
+        setState(() {
+          if (userVote.vote == 1) {
+            likePressed = true;
+          } else if (userVote.vote == -1) {
+            dislikePressed = true;
+          }
+        });
+      }
+    } catch (e) {
+      print('Error checking user vote: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,40 +109,30 @@ class _IncidentDetailsState extends State<IncidentDetails> {
                   Text('Location: $locationString'),
                 if (incidentData?['username'] != null) ...[
                   Text('Description:'),
-                  Text(incidentData!['description']),
+                  Text(
+                    incidentData!['description'],
+                  )
                 ],
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.thumb_up),
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('incidents')
-                            .doc(widget.documentId)
-                            .update({
-                          'likes': FieldValue.increment(1),
-                        });
-
-                        setState(() {
-                          likes++;
-                        });
-                      },
+                      icon: Icon(Icons.thumb_up,
+                          color: likePressed == true ? Colors.green : null),
+                      onPressed: likePressed == true
+                          ? null
+                          : () {
+                              _handleVote(1);
+                            },
                     ),
                     Text('$likes Likes'),
                     IconButton(
-                      icon: Icon(Icons.thumb_down),
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('incidents')
-                            .doc(widget.documentId)
-                            .update({
-                          'dislikes': FieldValue.increment(1),
-                        });
-
-                        setState(() {
-                          dislikes++;
-                        });
-                      },
+                      icon: Icon(Icons.thumb_down,
+                          color: dislikePressed == true ? Colors.red : null),
+                      onPressed: dislikePressed == true
+                          ? null
+                          : () {
+                              _handleVote(-1);
+                            },
                     ),
                     Text('$dislikes Dislikes'),
                   ],
@@ -226,5 +143,79 @@ class _IncidentDetailsState extends State<IncidentDetails> {
         },
       ),
     );
+  }
+
+  _handleVote(int vote) async {
+    try {
+      if (vote == 1) {
+        FirebaseFirestore.instance
+            .collection('incidents')
+            .doc(widget.documentId)
+            .update({
+          'likes': FieldValue.increment(1),
+          'dislikes': FieldValue.increment(dislikePressed == true ? -1 : 0),
+        });
+      } else if (vote == -1) {
+        FirebaseFirestore.instance
+            .collection('incidents')
+            .doc(widget.documentId)
+            .update({
+          'dislikes': FieldValue.increment(1),
+          'likes': FieldValue.increment(likePressed == true ? -1 : 0),
+        });
+      }
+
+      await FirebaseFirestore.instance
+          .collection('votes')
+          .doc('$_currentUsername, ${widget.documentId}')
+          .set({
+        'username': _currentUsername,
+        'incidentId': widget.documentId,
+        'vote': vote,
+      });
+
+      setState(() {
+        if (vote == 1) {
+          likePressed = true;
+          dislikePressed = false;
+          likes++;
+          if (dislikePressed == true) {
+            dislikes--;
+          }
+        } else if (vote == -1) {
+          dislikePressed = true;
+          likePressed = false;
+          dislikes++;
+          if (likePressed == false) {
+            likes--;
+          }
+        }
+      });
+    } catch (e) {
+      print('Error handling vote: $e');
+    }
+  }
+
+  Future<VoteDetails?> getUserVote() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> voteSnapshot =
+          await FirebaseFirestore.instance
+              .collection('votes')
+              .doc('$_currentUsername, ${widget.documentId}')
+              .get();
+
+      if (voteSnapshot.exists) {
+        return VoteDetails(
+          username: voteSnapshot['username'],
+          incidentId: voteSnapshot['incidentId'],
+          vote: voteSnapshot['vote'],
+        );
+      }
+
+      return null;
+    } catch (e) {
+      print('Error getting user vote: $e');
+      return null;
+    }
   }
 }
