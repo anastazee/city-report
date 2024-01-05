@@ -4,11 +4,6 @@ import '/screens/view_incident/incident_details.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 class MyPosts extends StatefulWidget {
   @override
   _MyPostsState createState() => _MyPostsState();
@@ -45,12 +40,13 @@ class _MyPostsState extends State<MyPosts> {
 
           return Scaffold(
             appBar: AppBar(
-        title: Text('My Posts'),
-      ),
+              title: Text('My Posts'),
+            ),
             body: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('incidents')
-                  .where('username', isEqualTo: data?['username'].toString() ?? '')
+                  .where('username',
+                      isEqualTo: data?['username'].toString() ?? '')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

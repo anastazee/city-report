@@ -18,8 +18,6 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     final AddIncident = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -35,7 +33,7 @@ class _Home extends State<Home> {
         },
         child: Text(
           "Add Incident",
-          style: TextStyle(color:Colors.white),
+          style: TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
@@ -49,10 +47,10 @@ class _Home extends State<Home> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MapPage()),
-    );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MapPage()),
+          );
         },
         child: Text(
           "Go to Map",
@@ -70,10 +68,10 @@ class _Home extends State<Home> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MyPosts()),
-    );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyPosts()),
+          );
         },
         child: Text(
           "See my Posts",
@@ -82,7 +80,6 @@ class _Home extends State<Home> {
         ),
       ),
     );
-
 
     return Scaffold(
       appBar: MyAppBar(),
