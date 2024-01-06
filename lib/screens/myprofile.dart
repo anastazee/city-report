@@ -284,6 +284,7 @@ child: RichText(
       ),
       ],
     ),
+    bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
 } else {
     // Handle the case when there is no data

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/bars.dart';
 import '/screens/all_incidents.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -166,9 +167,7 @@ void searchLocation(String query) async {
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    appBar: AppBar(
-      title: Text('Flutter Map Demo'),
-    ),
+    appBar: MyAppBar(),
     body: Stack(
       children: [
         FlutterMap(
@@ -329,6 +328,7 @@ child: Icon(Icons.home),          ),
         ),
       ],
     ),
+    bottomNavigationBar: AppNavigationBar(selectedIndex: 0),
    
   );
 }

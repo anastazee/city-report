@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/bars.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/services/queries.dart';
@@ -61,9 +62,7 @@ class _IncidentDetailsState extends State<IncidentDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Incident Details'),
-      ),
+      appBar: MyAppBar(),
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: _getIncidentDocument(),
         builder: (context, snapshot) {
@@ -129,6 +128,7 @@ class _IncidentDetailsState extends State<IncidentDetails> {
           );
         },
       ),
+      bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
   }
 

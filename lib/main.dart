@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'services/auth.dart';
 import 'screens/home/wrapper.dart';
-
+import 'screens/myposts2.dart';
+import 'screens/map/mappage.dart';
+import 'screens/new_incident/new_incident.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -24,6 +26,13 @@ class MyApp extends StatelessWidget{
       value: AuthService().user,
        initialData: null,
        child: MaterialApp(
+              initialRoute: '/home', // Set the initial route
+      routes: {
+        '/map': (context) => MapPage(), // Define the 'map' route
+        '/new_incident': (context) => NewIncident(), 
+        '/my_posts': (context) => MyPosts(), 
+      },
+
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Color(0xFF6750A4),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/models/bars.dart';
 import '/screens/view_incident/incident_details.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,30 +29,28 @@ class _MyPostsState extends State<MyPosts> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text('My Posts'),
-            ),
+            appBar: MyAppBar(),
+            
             body: Center(
               child: CircularProgressIndicator(),
             ),
+            bottomNavigationBar: AppNavigationBar(selectedIndex: 2,),
           );
         } else if (snapshot.hasData) {
           Map<String, dynamic>? userData = snapshot.data;
 
           return Scaffold(
-            appBar: AppBar(
-              title: Text('My Posts'),
-            ),
+            appBar: MyAppBar(),
             body: buildStream('incidents', userData),
+            bottomNavigationBar: AppNavigationBar(selectedIndex: 2),
           );
         } else {
           return Scaffold(
-            appBar: AppBar(
-              title: Text('My Posts'),
-            ),
+            appBar: MyAppBar(),
             body: Center(
               child: Text('No data available'),
             ),
+            bottomNavigationBar: AppNavigationBar(selectedIndex: 2),
           );
         }
       },
@@ -97,44 +96,101 @@ class _MyPostsState extends State<MyPosts> {
 
         sortDocumentsByDateTime(combinedList);
 
-        return ListView.builder(
-          itemCount: combinedList.length,
-          itemBuilder: (context, index) {
-            return FutureBuilder(
-              future: fetchDocumentData(combinedList[index]),
-              builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
-                if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
+return ListView.builder(
+  itemCount: combinedList.length,
+  itemBuilder: (context, index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0), // Adjust vertical padding
+      child: Container(
+        width: 250.0, // Adjust the overall width of the list tiles
+        height: 75.0,
+        decoration: BoxDecoration(
+          color: Color(0xFFF7F2FA),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 8.0, // Add some spacing between the left edge and the content
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder(
+                future: fetchDocumentData(combinedList[index]),
+                builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
+                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                var data = asyncSnapshot.data!;
-                var title = data['title'] ?? '';
-                var documentId = combinedList[index].id;
-                var timestamp = data['datetime'] as Timestamp;
-                var datetime = timestamp.toDate();
-                String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(datetime);
+                  var data = asyncSnapshot.data!;
+                  var title = data['title'] ?? '';
+                  var timestamp = data['datetime'] as Timestamp;
+                  var datetime = timestamp.toDate();
+                  String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(datetime);
 
-                return ListTile(
-                  title: Text('$title'),
-                  subtitle: Text('${formattedDateTime}'),
-                  trailing: TextButton(
-                    onPressed: () {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$title',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '$formattedDateTime',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(70.0),),
+            Container(
+              width: 60.0,
+              height: 33.75,
+              decoration: BoxDecoration(
+                color: Color(0xFF6750A4),
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0), // Add padding to the right
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => IncidentDetails(
-                            documentId: documentId,
+                            documentId: combinedList[index].id,
                           ),
                         ),
                       );
                     },
-                    child: Text('More'),
+                    child: Text(
+                      'More',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                );
-              },
-            );
-          },
-        );
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+);
+
+
+
+
+
+
+
+
+
       },
     );
   }

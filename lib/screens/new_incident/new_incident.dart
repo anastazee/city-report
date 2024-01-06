@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/bars.dart';
 import "package:location/location.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,9 +62,7 @@ class _NewIncidentState extends State<NewIncident> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('New Incident'),
-      ),
+      appBar: MyAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -128,6 +127,7 @@ class _NewIncidentState extends State<NewIncident> {
           ),
         ),
       ),
+      bottomNavigationBar: AppNavigationBar(selectedIndex: 1),
     );
   }
 }
