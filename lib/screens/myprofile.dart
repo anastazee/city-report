@@ -35,6 +35,7 @@ class _Profile extends State<Profile>{
           int points = data?['points'];
           int level = points ~/ 10;
           int toNext = 10 - points%10;
+          String? email = data?['email'].toString();
           // Your existing TextFormField with the retrieved username
           final usernameField = TextFormField(
             controller: _username,
@@ -47,22 +48,7 @@ class _Profile extends State<Profile>{
               ),
             ),
           );
-
-          final emailField = TextFormField(
-                controller: _email,
-                autofocus: false,
-                validator: (value) {
-                  if (value != null && value != '' && !value.contains('@') && !value.endsWith('.com')) {
-                      return 'Enter a Valid Email Address';
-                    }
-                    return null;
-                  },
-                decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                    hintText: data?['email'].toString(),
-                    border:
-                        OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))));
-
+           
           final passwordField = TextFormField(
               obscureText: _obscureText,
               controller: _password,
@@ -94,7 +80,6 @@ class _Profile extends State<Profile>{
             padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
             onPressed: () async {
                 String username = _username.text.trim();
-                String email = _email.text.trim();
                 String password = _password.text.trim();
                 if (username.isNotEmpty){} 
                   bool taken = await isUsernameAlreadyTaken(username);
@@ -107,7 +92,7 @@ class _Profile extends State<Profile>{
                     );
                   }
                   else {
-                   bool check = await updateUserData(username, email, password);
+                   bool check = await updateUserData(username, password);
                    if (check) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -159,7 +144,8 @@ class _Profile extends State<Profile>{
    return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: MyAppBar(),
-        body: Column(
+      body: SingleChildScrollView(
+        child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
@@ -178,20 +164,6 @@ class _Profile extends State<Profile>{
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const SizedBox(height: 15.0),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '  Email',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            emailField,
-          ],
-        ),
         const SizedBox(height: 15.0),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +192,14 @@ class _Profile extends State<Profile>{
             passwordField,
           ],
         ),
-        const SizedBox(height: 25.0),
+        const SizedBox(height: 20.0),
+        Text('You are registered with $email.\n',
+                style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey
+              ),
+          ),
        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -284,6 +263,7 @@ child: RichText(
       ),
       ],
     ),
+      ),
     bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
 } else {

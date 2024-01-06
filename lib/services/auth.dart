@@ -96,7 +96,7 @@ Future<Map<String, dynamic>?> getUserData() async {
     return null;
   }
 
-  Future<bool> updateUserData(String username, String email, String password) async {
+  Future<bool> updateUserData(String username, String password) async {
   User? user = FirebaseAuth.instance.currentUser;
 
   if (user != null) {
@@ -110,12 +110,6 @@ Future<Map<String, dynamic>?> getUserData() async {
           'username': username,
              });
 
-    }
-    if (email.isNotEmpty) {
-      await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .update({'email': email});
     }
     if (password.isNotEmpty) {
         await user.updatePassword(password);

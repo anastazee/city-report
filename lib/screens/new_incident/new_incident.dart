@@ -205,7 +205,8 @@ class _NewIncidentState extends State<NewIncident> {
       appBar: AppBar(
         title: Text('New Incident'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -289,6 +290,8 @@ class _NewIncidentState extends State<NewIncident> {
           ),
         ),
       ),
+      ),
+      bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
   }
 }

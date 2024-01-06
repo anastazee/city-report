@@ -70,3 +70,9 @@ dependencies {
     implementation platform('com.google.firebase:firebase-auth')
     implementation platform('com.google.firebase:firebase-firestore')
 }
+
+android {                                                                                                       
+  defaultConfig {                                                                                               
+    minSdkVersion 21                                                                                            
+  } 
+}      
