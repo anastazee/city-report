@@ -1,71 +1,77 @@
-// camera.dart
-
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
 
 class CameraPage extends StatefulWidget {
+  const CameraPage({Key? key}) : super(key: key);
+
   @override
   _CameraPageState createState() => _CameraPageState();
 }
 
 class _CameraPageState extends State<CameraPage> {
-  late CameraController _cameraController;
+  late CameraController _cameraController; // Use late initialization
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    initializeCamera();
   }
 
-  Future<void> _initializeCamera() async {
+  Future<void> initializeCamera() async {
     final cameras = await availableCameras();
-
     _cameraController = CameraController(
-      cameras[0],
+      cameras[0], // Use the first available camera
       ResolutionPreset.medium,
     );
 
     await _cameraController.initialize();
-    if (!mounted)
-      return; // Ensure the state is still mounted before setting state
-    setState(
-        () {}); // Trigger a rebuild to update the UI after the camera is initialized
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  @override
-  void dispose() {
-    _cameraController.dispose();
-    super.dispose();
+  Future<void> _onCapturePressed() async {
+    try {
+      final XFile capturedImage = await _cameraController.takePicture();
+      Navigator.pop(context, capturedImage);
+    } catch (e) {
+      print('Error capturing image: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_cameraController.value.isInitialized) {
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return Container(); // You might want to show a loading indicator here
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Camera Page'),
       ),
-      body: Center(
-        child: CameraPreview(_cameraController),
+      body: Stack(
+        children: [
+          CameraPreview(_cameraController),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _onCapturePressed,
+                child: Text('Capture'),
+              ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final XFile? image = await _cameraController.takePicture();
-
-          if (image != null) {
-            Navigator.pop(context,
-                image); // Pass the captured image back to the previous page
-          }
-        },
-        child: Icon(Icons.camera),
-      ),
+      // Add your camera controls or other UI elements here
     );
+  }
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
   }
 }
