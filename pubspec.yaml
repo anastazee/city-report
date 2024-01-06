@@ -45,6 +45,11 @@ dependencies:
   intl: ^0.17.0
   geocoding: ^2.1.1
   rxdart: ^0.27.0
+  image_picker: ^1.0.6
+  camera: ^0.10.5+8
+  path_provider: ^2.0.2
+  path: ^1.8.0
+  firebase_storage: ^11.6.0
 
 
 dev_dependencies:
