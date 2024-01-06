@@ -134,9 +134,9 @@ class _NewIncidentState extends State<NewIncident> {
 */
 
 // new_incident.dart
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/bars.dart';
-import "package:location/location.dart";
+import 'package:location/location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -145,6 +145,7 @@ import 'package:flutter_application_1/services/queries.dart';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import './camerapage.dart'; // Import the CameraPage
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NewIncident extends StatefulWidget {
   @override
@@ -254,8 +255,16 @@ class _NewIncidentState extends State<NewIncident> {
                 },
                 child: const Text('Take Picture'),
               ),
-              if (_image != null) Image.file(_image!),
-              const SizedBox(height: 16.0),
+              Column(
+                children: [
+                  if (_image != null) SizedBox(height: 16.0),
+                  _image != null
+                      ? kIsWeb
+                          ? Image.network(_image!.path)
+                          : Image.file(_image!)
+                      : Container(), // or some placeholder widget
+                ],
+              ),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
@@ -268,7 +277,7 @@ class _NewIncidentState extends State<NewIncident> {
                       imageURL:
                           _image != null ? await uploadImage(_image!) : null,
                     );
-
+                    print('Image URL: ${incidentDetails.imageURL}');
                     await FirebaseFirestore.instance.collection('recent').add({
                       'datetime': incidentDetails.datetime,
                       'description': incidentDetails.description,
@@ -293,18 +302,38 @@ class _NewIncidentState extends State<NewIncident> {
   }
 }
 
-// ... Rest of the code remains the same ...
-Future<String> uploadImage(File imageFile) async {
+Future<String?> uploadImage(File imageFile) async {
   try {
-    final FirebaseStorage storage = FirebaseStorage.instance;
+    FirebaseStorage storage = FirebaseStorage.instance;
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final Reference storageRef =
-        storage.ref().child('incident_images/$fileName.jpg');
-    await storageRef.putFile(imageFile);
-    String downloadURL = await storageRef.getDownloadURL();
-    return downloadURL;
+    Reference storageRef = storage.ref().child('images/$fileName.jpg');
+
+    if (kIsWeb) {
+      // Use web-specific logic for uploading images
+      UploadTask task = storageRef.putData(await imageFile.readAsBytes());
+
+      // Wait for the upload to complete
+      await task;
+
+      // Retrieve the download URL
+      String downloadURL = await storageRef.getDownloadURL();
+
+      print('Image uploaded successfully!');
+
+      return downloadURL;
+    } else {
+      // Use platform-specific logic for uploading images
+      await storageRef.putFile(imageFile);
+
+      // Retrieve the download URL
+      String downloadURL = await storageRef.getDownloadURL();
+
+      print('Image uploaded successfully!');
+
+      return downloadURL;
+    }
   } catch (e) {
     print('Error uploading image: $e');
-    return '';
+    return null; // Return null in case of an error
   }
 }
