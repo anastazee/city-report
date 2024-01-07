@@ -137,6 +137,7 @@ class _NewIncidentState extends State<NewIncident> {
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import 'package:flutter_application_1/models/bars.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -208,135 +209,109 @@ class _NewIncidentState extends State<NewIncident> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _incidentTitleController,
-                decoration: InputDecoration(labelText: 'Incident Title'),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _incidentDescriptionController,
-                decoration: InputDecoration(labelText: 'Incident Description'),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              Text(
-                'Current Location: ${_currentLocation?.latitude ?? ''}, ${_currentLocation?.longitude ?? ''}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  final XFile? capturedImage = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CameraPage()),
-                  );
-
-                  if (capturedImage != null) {
-                    setState(() {
-                      _image = File(capturedImage.path);
-                    });
-                  }
-                },
-                child: const Text('Take Picture'),
-              ),
-              Column(
-                children: [
-                  if (_image != null) SizedBox(height: 16.0),
-                  _image != null
-                      ? kIsWeb
-                          ? Image.network(_image!.path)
-                          : Image.file(_image!)
-                      : Container(), // or some placeholder widget
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    IncidentDetails incidentDetails = IncidentDetails(
-                      datetime: Timestamp.now(),
-                      description: _incidentDescriptionController.text,
-                      location: _currentLocation,
-                      title: _incidentTitleController.text,
-                      username: _currentUsername,
-                      imageURL:
-                          _image != null ? await uploadImage(_image!) : null,
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _incidentTitleController,
+                  decoration: InputDecoration(labelText: 'Incident Title'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter a title';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _incidentDescriptionController,
+                  decoration:
+                      InputDecoration(labelText: 'Incident Description'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  'Current Location: ${_currentLocation?.latitude ?? ''}, ${_currentLocation?.longitude ?? ''}',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    final String? capturedImageURL = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CameraPage()),
                     );
-                    print('Image URL: ${incidentDetails.imageURL}');
-                    await FirebaseFirestore.instance.collection('recent').add({
-                      'datetime': incidentDetails.datetime,
-                      'description': incidentDetails.description,
-                      'location': incidentDetails.location,
-                      'title': incidentDetails.title,
-                      'username': incidentDetails.username,
-                      'likes': 0,
-                      'dislikes': 0,
-                      'imageURL': incidentDetails.imageURL,
-                    });
 
-                    Navigator.pop(context); // Go back to the previous page
-                  }
-                },
-                child: const Text('Add Incident'),
-              ),
-            ],
+                    if (capturedImageURL != null) {
+                      setState(() {
+                        _image = File(capturedImageURL);
+                      });
+                    }
+                  },
+                  child: const Text('Take Picture'),
+                ),
+                Column(
+                  children: [
+                    if (_image != null) SizedBox(height: 16.0),
+                    _image != null
+                        ? kIsWeb
+                            ? Image.network(_image!.path)
+                            : Image.file(_image!)
+                        : Container(), // or some placeholder widget
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      if (_image != null) {
+                        IncidentDetails incidentDetails = IncidentDetails(
+                          datetime: Timestamp.now(),
+                          description: _incidentDescriptionController.text,
+                          location: _currentLocation,
+                          title: _incidentTitleController.text,
+                          username: _currentUsername,
+                          imageURL: _image != null ? _image!.path : null,
+                        );
+
+                        print('Image URL: ${incidentDetails.imageURL}');
+                        await FirebaseFirestore.instance
+                            .collection('recent')
+                            .add({
+                          'datetime': incidentDetails.datetime,
+                          'description': incidentDetails.description,
+                          'location': incidentDetails.location,
+                          'title': incidentDetails.title,
+                          'username': incidentDetails.username,
+                          'likes': 0,
+                          'dislikes': 0,
+                          'imageURL': incidentDetails.imageURL,
+                        });
+
+                        // Reset the image file after adding the incident
+                        setState(() {
+                          _image = null;
+                        });
+                      }
+
+                      Navigator.pop(context); // Go back to the previous page
+                    }
+                  },
+                  child: const Text('Add Incident'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      ),
       bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
-  }
-}
-
-Future<String?> uploadImage(File imageFile) async {
-  try {
-    FirebaseStorage storage = FirebaseStorage.instance;
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference storageRef = storage.ref().child('images/$fileName.jpg');
-
-    if (kIsWeb) {
-      // Use web-specific logic for uploading images
-      UploadTask task = storageRef.putData(await imageFile.readAsBytes());
-
-      // Wait for the upload to complete
-      await task;
-
-      // Retrieve the download URL
-      String downloadURL = await storageRef.getDownloadURL();
-
-      print('Image uploaded successfully!');
-
-      return downloadURL;
-    } else {
-      // Use platform-specific logic for uploading images
-      await storageRef.putFile(imageFile);
-
-      // Retrieve the download URL
-      String downloadURL = await storageRef.getDownloadURL();
-
-      print('Image uploaded successfully!');
-
-      return downloadURL;
-    }
-  } catch (e) {
-    print('Error uploading image: $e');
-    return null; // Return null in case of an error
   }
 }
