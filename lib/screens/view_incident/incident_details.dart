@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/services/queries.dart';
 import 'package:flutter_application_1/models/votes.dart';
-
+import 'package:photo_view/photo_view.dart';
 class IncidentDetails extends StatefulWidget {
   final String documentId;
 
@@ -59,52 +59,103 @@ class _IncidentDetailsState extends State<IncidentDetails> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: _getIncidentDocument(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: MyAppBar(),
+    body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      future: _getIncidentDocument(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
 
-          var incidentData = snapshot.data?.data();
+        var incidentData = snapshot.data?.data();
 
-          if (incidentData == null) {
-            return Center(child: Text('Incident not found'));
-          }
+        if (incidentData == null) {
+          return Center(child: Text('Incident not found'));
+        }
 
-          DateTime datetime = incidentData['datetime']?.toDate() ?? DateTime.now();
-          String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(datetime);
+        DateTime datetime = incidentData['datetime']?.toDate() ?? DateTime.now();
+        String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(datetime);
 
-          String locationString = incidentData['location'] != null
-              ? 'Latitude: ${incidentData['location'].latitude.toStringAsFixed(4)}, Longitude: ${incidentData['location'].longitude.toStringAsFixed(4)}'
-              : 'N/A';
+        String locationString = incidentData['location'] != null
+            ? 'Latitude: ${incidentData['location'].latitude.toStringAsFixed(4)}, Longitude: ${incidentData['location'].longitude.toStringAsFixed(4)}'
+            : 'N/A';
 
-          int initialLikes = incidentData['likes'] ?? 0;
-          int initialDislikes = incidentData['dislikes'] ?? 0;
+        int initialLikes = incidentData['likes'] ?? 0;
+        int initialDislikes = incidentData['dislikes'] ?? 0;
 
-          likes = initialLikes;
-          dislikes = initialDislikes;
+        likes = initialLikes;
+        dislikes = initialDislikes;
 
-          return Padding(
+        return SingleChildScrollView(
+          child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (incidentData['title'] != null) Text('Title: ${incidentData['title']}'),
-                if (incidentData['datetime'] != null) Text('Date and Time: $formattedDateTime'),
-                if (incidentData['location'] != null) Text('Location: $locationString'),
+                SizedBox(height: 16.0),
+                Text(
+                  "Report's Details",
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  '${incidentData['title'] ?? ''}',
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  '$formattedDateTime',
+                  style: TextStyle(fontSize: 20.0),
+                ),
                 if (incidentData['username'] != null) ...[
-                  Text('Description:'),
-                  Text(incidentData['description']),
+                  SizedBox(height: 8.0),
+                  Text(
+                    '@${incidentData['username']}',
+                    style: TextStyle(fontSize: 20.0, color: Colors.grey[850], fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Short Description:',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4.0),
+                  Text(
+                    '${incidentData['description']}',
+                    style: TextStyle(fontSize: 16.0, color: Colors.grey[850]),
+                  ),
                 ],
+                if (incidentData['imageURL'] != null) ...[
+                  SizedBox(height: 16.0),
+                  Text(
+                    'Incident Documents',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ZoomableImage(imageURL: incidentData['imageURL']),
+                        ),
+                      );
+                    },
+                    child: Image.network(
+                      incidentData['imageURL'],
+                      width: double.infinity,
+                      height: 200.0, // Adjust the initial image size
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+                SizedBox(height: 16.0),
+                Text("Rate this post", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
                 Row(
                   children: [
                     IconButton(
@@ -123,14 +174,26 @@ class _IncidentDetailsState extends State<IncidentDetails> {
                     Text('$dislikes Dislikes'),
                   ],
                 ),
+                SizedBox(height: 8.0),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
               ],
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
-    );
-  }
+          ),
+        );
+      },
+    ),
+    bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
+  );
+}
+
 
   Future<DocumentSnapshot<Map<String, dynamic>>> _getIncidentDocument() async {
     try {
@@ -153,14 +216,14 @@ class _IncidentDetailsState extends State<IncidentDetails> {
 
   _handleVote(int vote) async {
     try {
-       // Check if the document exists in 'recent' collection
-    DocumentSnapshot<Map<String, dynamic>> recentSnapshot =
-        await FirebaseFirestore.instance.collection('recent').doc(widget.documentId).get();
+      // Check if the document exists in 'recent' collection
+      DocumentSnapshot<Map<String, dynamic>> recentSnapshot =
+          await FirebaseFirestore.instance.collection('recent').doc(widget.documentId).get();
 
-    if (!recentSnapshot.exists) {
-      // Document not found in 'recent' collection, so disable voting
-      return;
-    }
+      if (!recentSnapshot.exists) {
+        // Document not found in 'recent' collection, so disable voting
+        return;
+      }
 
       if (vote == 1) {
         FirebaseFirestore.instance.collection('recent').doc(widget.documentId).update({
@@ -220,5 +283,39 @@ class _IncidentDetailsState extends State<IncidentDetails> {
       print('Error getting user vote: $e');
       return null;
     }
+  }
+}
+
+class ZoomableImage extends StatelessWidget {
+  final String imageURL;
+
+  ZoomableImage({required this.imageURL});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          PhotoView(
+            imageProvider: NetworkImage(imageURL),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+            backgroundDecoration: BoxDecoration(
+              color: Colors.black,
+            ),
+          ),
+          Positioned(
+            left: 16.0,
+            bottom: 16.0,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context); // Navigate back when the back button is pressed
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

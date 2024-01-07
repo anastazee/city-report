@@ -316,7 +316,7 @@ class _NewIncidentState extends State<NewIncident> {
           ),
         ),
       ),
-      bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
+      bottomNavigationBar: AppNavigationBar(selectedIndex: 1),
     );
   }
 }
