@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         initialRoute: '/home', // Set the initial route
         routes: {
+          '/home': (context)=> Wrapper(),
           '/map': (context) => MapPage(), // Define the 'map' route
           '/new_incident': (context) => NewIncident(),
           '/my_posts': (context) => MyPosts(),

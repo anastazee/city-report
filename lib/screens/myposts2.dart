@@ -146,7 +146,7 @@ return ListView.builder(
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(70.0),),
+              padding: const EdgeInsets.all(30.0),),
             Container(
               width: 60.0,
               height: 33.75,

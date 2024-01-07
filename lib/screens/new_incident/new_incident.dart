@@ -157,7 +157,7 @@ class _NewIncidentState extends State<NewIncident> {
   final _incidentTitleController = TextEditingController();
   final _incidentDescriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  File? _image;
+  String _imagePath = '';
 
   GeoPoint? _currentLocation;
   Location location = Location();
@@ -245,14 +245,14 @@ class _NewIncidentState extends State<NewIncident> {
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () async {
-                    final String? capturedImageURL = await Navigator.push(
+                    _imagePath = await Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => CameraPage()),
                     );
 
-                    if (capturedImageURL != null) {
+                    if (_imagePath != '') {
                       setState(() {
-                        _image = File(capturedImageURL);
+                        _imagePath = _imagePath;
                       });
                     }
                   },
@@ -260,25 +260,30 @@ class _NewIncidentState extends State<NewIncident> {
                 ),
                 Column(
                   children: [
-                    if (_image != null) SizedBox(height: 16.0),
-                    _image != null
-                        ? kIsWeb
-                            ? Image.network(_image!.path)
-                            : Image.file(_image!)
-                        : Container(), // or some placeholder widget
+                    if (_imagePath.isNotEmpty)
+                      SizedBox(height: 16.0),
+                    if (_imagePath.isNotEmpty)
+                      Image.file(
+                        File(_imagePath),
+                        width: 200.0, // Set a specific width for the image
+                        height: 200.0, // Set a specific height for the image
+                        fit: BoxFit.cover, // Adjust the fit as needed
+                      ),
+                    // Add other widgets below if needed
                   ],
                 ),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
-                      if (_image != null) {
+                      if (_imagePath != '') {
+                        String? imageURL = await uploadImage(File(_imagePath));
                         IncidentDetails incidentDetails = IncidentDetails(
                           datetime: Timestamp.now(),
                           description: _incidentDescriptionController.text,
                           location: _currentLocation,
                           title: _incidentTitleController.text,
                           username: _currentUsername,
-                          imageURL: _image != null ? _image!.path : null,
+                          imageURL: imageURL,
                         );
 
                         print('Image URL: ${incidentDetails.imageURL}');
@@ -297,7 +302,7 @@ class _NewIncidentState extends State<NewIncident> {
 
                         // Reset the image file after adding the incident
                         setState(() {
-                          _image = null;
+                          _imagePath = '';
                         });
                       }
 

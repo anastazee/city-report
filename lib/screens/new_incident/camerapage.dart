@@ -128,52 +128,6 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
-  Future<String?> _uploadImage(File imageFile) async {
-    try {
-      FirebaseStorage storage = FirebaseStorage.instance;
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference storageRef = storage.ref().child('images/$fileName.jpg');
-
-      if (kIsWeb) {
-        // Use web-specific logic for uploading images
-        final Uint8List data = await imageFile.readAsBytes();
-        final String base64Image = base64Encode(data);
-
-        // Send the image data to your server
-        final response = await http.post(
-          Uri.parse(
-              'http://localhost:62069/upload'), // Replace with your server endpoint
-          body: {'image': base64Image},
-        );
-
-        if (response.statusCode == 200) {
-          // Parse the server's response to get the download URL
-          String downloadURL = jsonDecode(response.body)['downloadURL'];
-          print('Image uploaded successfully!');
-          return downloadURL;
-        } else {
-          print('Server returned an error: ${response.body}');
-          return null;
-        }
-      } else {
-        // Use platform-specific logic for uploading images
-        UploadTask task = storageRef.putFile(imageFile);
-
-        // Wait for the upload to complete
-        await task;
-
-        // Retrieve the download URL
-        String downloadURL = await storageRef.getDownloadURL();
-
-        print('Image uploaded successfully!');
-        return downloadURL;
-      }
-    } catch (e) {
-      print('Error uploading image: $e');
-      return null; // Return null in case of an error
-    }
-  }
-
   Future<void> _deleteImageFromStorage(String imageURL) async {
     try {
       FirebaseStorage storage = FirebaseStorage.instance;
@@ -191,16 +145,7 @@ class _CameraPageState extends State<CameraPage> {
       return Container(); // You might want to show a loading indicator here
     }
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_imageCaptured) {
-          // Delete the image from storage if the user goes back without adding the incident
-          await _deleteImageFromStorage(
-              await _uploadImage(File(_capturedImage.path)) ?? '');
-        }
-        return true;
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text('Camera Page'),
         ),
@@ -215,9 +160,9 @@ class _CameraPageState extends State<CameraPage> {
                   onPressed: () async {
                     await _onCapturePressed();
                     if (_imageCaptured) {
-                      String? imageURL =
-                          await _uploadImage(File(_capturedImage.path));
-                      Navigator.pop(context, imageURL);
+                      /*String? imageURL =
+                          await _uploadImage(File(_capturedImage.path));*/
+                      Navigator.pop(context, _capturedImage.path);
                     }
                   },
                   child: Text('Capture'),
@@ -227,8 +172,7 @@ class _CameraPageState extends State<CameraPage> {
           ],
         ),
         // Add your camera controls or other UI elements here
-      ),
-    );
+      );
   }
 
   @override
@@ -237,3 +181,25 @@ class _CameraPageState extends State<CameraPage> {
     super.dispose();
   }
 }
+
+  Future<String?> uploadImage(File imageFile) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageRef = storage.ref().child('images/$fileName.jpg');
+        UploadTask task = storageRef.putFile(imageFile);
+
+        // Wait for the upload to complete
+        await task;
+
+        // Retrieve the download URL
+        String downloadURL = await storageRef.getDownloadURL();
+
+        print('Image uploaded successfully!');
+        return downloadURL;
+      }
+     catch (e) {
+      print('Error uploading image: $e');
+      return null; // Return null in case of an error
+    }
+  }
