@@ -79,10 +79,12 @@ class _CameraPageState extends State<CameraPage> {
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key}) : super(key: key);
@@ -135,13 +137,24 @@ class _CameraPageState extends State<CameraPage> {
       if (kIsWeb) {
         // Use web-specific logic for uploading images
         final Uint8List data = await imageFile.readAsBytes();
-        await storageRef.putData(data);
+        final String base64Image = base64Encode(data);
 
-        // Retrieve the download URL
-        String downloadURL = await storageRef.getDownloadURL();
+        // Send the image data to your server
+        final response = await http.post(
+          Uri.parse(
+              'http://localhost:62069/upload'), // Replace with your server endpoint
+          body: {'image': base64Image},
+        );
 
-        print('Image uploaded successfully!');
-        return downloadURL;
+        if (response.statusCode == 200) {
+          // Parse the server's response to get the download URL
+          String downloadURL = jsonDecode(response.body)['downloadURL'];
+          print('Image uploaded successfully!');
+          return downloadURL;
+        } else {
+          print('Server returned an error: ${response.body}');
+          return null;
+        }
       } else {
         // Use platform-specific logic for uploading images
         UploadTask task = storageRef.putFile(imageFile);
