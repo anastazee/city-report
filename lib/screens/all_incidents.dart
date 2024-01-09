@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/screens/view_incident/incident_details.dart';
 import 'package:intl/intl.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
+
 /*class AllIncidents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -100,117 +102,143 @@ Future<void> getUserLocation() async {
 }
 
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:MyAppBar(),
-      body: Stack(
-        children: [
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('recent').snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                  return Center(
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 40.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ),
-                );
-              }
+      appBar: MyAppBar(),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('recent').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-              var incidents = snapshot.data!.docs;
+          var incidents = snapshot.data!.docs;
 
-              // Sort incidents based on the current sorting mode
-              sortByProximity
-                  ? sortIncidentsByProximity(incidents)
-                  : sortIncidentsByDateTime(incidents);
+          sortByProximity
+              ? sortIncidentsByProximity(incidents)
+              : sortIncidentsByDateTime(incidents);
 
-              return ListView.builder(
-                itemCount: incidents.length,
-                itemBuilder: (context, index) {
-                  return FutureBuilder(
-                    future: fetchIncidentData(incidents[index]),
-                    builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
-                      if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                  child: SizedBox(
-                    width: 40.0,
-                    height: 40.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ),
-                );
-                      }
+          return ListView.builder(
+            itemCount: incidents.length,
+            itemBuilder: (context, index) {
+              return FutureBuilder(
+                future: fetchIncidentData(incidents[index]),
+                builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
+                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                      var data = asyncSnapshot.data!;
-                      var title = data['title'] ?? '';
-                      var docid = incidents[index].id;
-                      var timestamp = data['datetime'] as Timestamp;
-                      var datetime = timestamp.toDate();
-                      String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(datetime);
+                  var data = asyncSnapshot.data!;
+                  var title = data['title'] ?? '';
+                  var docid = incidents[index].id;
+                  var timestamp = data['datetime'] as Timestamp;
+                  var datetime = timestamp.toDate();
+                  String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(datetime);
 
-                      var proximity = '';
-                      if (sortByProximity) {
-                        var geopoint = data['location'] as GeoPoint?;
-                        var incidentLocation =
-                            geopoint != null ? Location1(geopoint.latitude, geopoint.longitude) : null;
+                  var proximity = '';
+                  if (sortByProximity) {
+                    var geopoint = data['location'] as GeoPoint?;
+                    var incidentLocation =
+                        geopoint != null ? Location1(geopoint.latitude, geopoint.longitude) : null;
 
-                        // Handle cases where location is null
-                        if (incidentLocation != null) {
-                          var distance = Geolocator.distanceBetween(
-                            userLocation!.latitude,
-                            userLocation!.longitude,
-                            incidentLocation.latitude,
-                            incidentLocation.longitude,
-                          );
-
-                          proximity = 'Proximity: ${distance.toStringAsFixed(2)} meters';
-                        } else {
-                          proximity = 'Proximity: N/A';
-                        }
-                      }
-
-                      return ListTile(
-                        title: Text('$title'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('${formattedDateTime}'),
-                            if (sortByProximity) Text(proximity),
-                          ],
-                        ),
-                        trailing: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => IncidentDetails(documentId: docid),
-                              ),
-                            );
-                          },
-                          child: Text('More'),
-                        ),
+                    if (incidentLocation != null) {
+                      var distance = Geolocator.distanceBetween(
+                        userLocation!.latitude,
+                        userLocation!.longitude,
+                        incidentLocation.latitude,
+                        incidentLocation.longitude,
                       );
-                    },
+
+                      proximity = '${(distance/1000).toStringAsFixed(2)} km away';
+                    } else {
+                      proximity = 'Proximity: N/A';
+                    }
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    child: Container(
+                      width: 250.0,
+                      height: 90.0,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF7F2FA),
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 8.0,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$title',
+                                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '$formattedDateTime',
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                if (sortByProximity) Text(proximity,style: TextStyle(fontSize: 12.0),),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                      padding: const EdgeInsets.all(65.0),),
+                          Container(
+                      width: 60.0,
+                      height: 33.75,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF6750A4),
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5.0), // Add padding to the right
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                SwipeablePageRoute(
+                                  builder: (context) => IncidentDetails(
+                                    documentId: incidents[index].id,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'More',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               );
             },
-          ),
-          Positioned(
-            bottom: 16.0,
-            right: 16.0,
-            child: _buildSortButton(),
-          ),
-        ],
+          );
+        },
       ),
       bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
+      floatingActionButton: _buildSortButton(),
     );
   }
+
 
   Widget _buildSortButton() {
     return FloatingActionButton(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
 import '../screens/myprofile.dart';
+import 'package:vibration/vibration.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -10,7 +12,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () {
             Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Profile()),
+            SwipeablePageRoute(builder: (context) => Profile()),
           );
           },
           iconSize: 35.0
@@ -24,7 +26,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
            onPressed: () {
             Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Profile()),
+            SwipeablePageRoute(builder: (context) => Profile()),
           );
           },
           iconSize: 35.0
@@ -64,7 +66,7 @@ class AppNavigationBar extends StatelessWidget {
   Widget _buildNavItem(BuildContext context, int index, IconData icon, String label) {
     return GestureDetector(
       onTap: () {
-
+        //Vibration.vibrate();
         // Handle navigation based on the selected index
         switch (index) {
           case 0:

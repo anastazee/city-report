@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter/services.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 
 import '../view_incident/incident_details.dart';
@@ -255,7 +256,7 @@ child: Icon(Icons.home),          ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  SwipeablePageRoute(
                     builder: (context) => AllIncidents(),
                   ),
                 );
