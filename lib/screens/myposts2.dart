@@ -63,15 +63,15 @@ class _MyPostsState extends State<MyPosts> {
     final Stream<QuerySnapshot<Map<String, dynamic>>> incidentsStream =
         FirebaseFirestore.instance
             .collection('incidents')
-            .where('username',
-                isEqualTo: userData?['username'].toString() ?? '')
+            .where('uid',
+                isEqualTo: user!.uid.toString() ?? '')
             .snapshots();
 
     final Stream<QuerySnapshot<Map<String, dynamic>>> recentStream =
         FirebaseFirestore.instance
             .collection('recent')
-            .where('username',
-                isEqualTo: userData?['username'].toString() ?? '')
+            .where('uid',
+                isEqualTo: user!.uid.toString().toString() ?? '')
             .snapshots();
 
     final mergedStream = Rx.combineLatest2(
@@ -106,7 +106,7 @@ class _MyPostsState extends State<MyPosts> {
               padding: const EdgeInsets.symmetric(
                   vertical: 10.0, horizontal: 20.0), // Adjust vertical padding
               child: Container(
-                width: 250.0, // Adjust the overall width of the list tiles
+                width: MediaQuery.of(context).size.width * 0.8, // Adjust the overall width of the list tiles
                 height: 75.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFF7F2FA),
@@ -161,9 +161,7 @@ class _MyPostsState extends State<MyPosts> {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(40.0),
-                    ),
+                    Spacer(),
                     if (combinedList[index].reference.parent.id == 'recent')
                       Container(
                         child: Padding(

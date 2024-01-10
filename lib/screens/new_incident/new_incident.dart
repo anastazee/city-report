@@ -163,6 +163,7 @@ class _NewIncidentState extends State<NewIncident> {
   Location location = Location();
   User? user = FirebaseAuth.instance.currentUser;
   String? _currentUsername;
+  String? _uid; 
 
   @override
   void initState() {
@@ -195,6 +196,7 @@ class _NewIncidentState extends State<NewIncident> {
       String? currentUsername = await getUsernameFromEmail(user?.email ?? '');
       setState(() {
         _currentUsername = currentUsername;
+        _uid = user?.uid;
       });
     } catch (e) {
       print('Error getting username: $e');
@@ -298,6 +300,7 @@ class _NewIncidentState extends State<NewIncident> {
                           'likes': 0,
                           'dislikes': 0,
                           'imageURL': incidentDetails.imageURL,
+                          'uid': _uid,
                         });
 
                         // Reset the image file after adding the incident

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 import '../screens/myprofile.dart';
 import 'package:vibration/vibration.dart';
+import '../screens/notifications.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-          icon: const Icon(Icons.account_circle_rounded),
+          icon: const Icon(Icons.circle_notifications),
           onPressed: () {
             Navigator.push(
             context,
-            SwipeablePageRoute(builder: (context) => Profile()),
+            SwipeablePageRoute(builder: (context) => Notifications()),
           );
           },
           iconSize: 35.0
@@ -22,7 +23,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Color.fromARGB(255, 232, 222, 255),
       actions: [
         IconButton(
-           icon: Icon(Icons.email_outlined),
+           icon: Icon(Icons.account_circle_rounded),
            onPressed: () {
             Navigator.push(
             context,

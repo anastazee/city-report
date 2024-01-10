@@ -163,7 +163,7 @@ Future<void> getUserLocation() async {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                     child: Container(
-                      width: 250.0,
+                      width: MediaQuery.of(context).size.width * 0.8,
                       height: 90.0,
                       decoration: BoxDecoration(
                         color: Color(0xFFF7F2FA),
@@ -192,8 +192,7 @@ Future<void> getUserLocation() async {
                               ],
                             ),
                           ),
-                          Padding(
-                      padding: const EdgeInsets.all(65.0),),
+                          Spacer(),
                           Container(
                       width: 60.0,
                       height: 33.75,

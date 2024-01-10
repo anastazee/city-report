@@ -16,7 +16,7 @@ class _Profile extends State<Profile>{
    final AuthService _auth = AuthService();
    bool _obscureText = true;
    final _username = TextEditingController();
-   final _email = TextEditingController();
+   //final _email = TextEditingController();
    final _password = TextEditingController();
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -36,6 +36,7 @@ class _Profile extends State<Profile>{
           int level = points ~/ 10;
           int toNext = 10 - points%10;
           String? email = data?['email'].toString();
+          String? username = data?['username'].toString();
           // Your existing TextFormField with the retrieved username
           final usernameField = TextFormField(
             controller: _username,
@@ -81,9 +82,10 @@ class _Profile extends State<Profile>{
             onPressed: () async {
                 String username = _username.text.trim();
                 String password = _password.text.trim();
-                if (username.isNotEmpty){} 
-                  bool taken = await isUsernameAlreadyTaken(username);
-                  if (taken) {
+                bool taken = false;
+                if (username.isNotEmpty)
+                  taken = await isUsernameAlreadyTaken(username);
+                if (taken) {
                     ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                     content: Text('Username is already taken. Please choose a different one.'),
@@ -104,13 +106,14 @@ class _Profile extends State<Profile>{
                    else {
                     ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Error updating user data'),
+                      content: Text('Error updating user data. Try logging in again.'),
                       backgroundColor: Colors.red,
                     ),
                     );
                    }
                   }
-            },
+                  },
+
             child: Text(
               "Update",
               style: TextStyle(color: Colors.white),
@@ -165,6 +168,7 @@ class _Profile extends State<Profile>{
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         const SizedBox(height: 15.0),
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -178,7 +182,7 @@ class _Profile extends State<Profile>{
             usernameField,
           ],
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 18.0),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -192,12 +196,13 @@ class _Profile extends State<Profile>{
             passwordField,
           ],
         ),
-        const SizedBox(height: 20.0),
+        
+        const SizedBox(height: 10.0),
         Text('You are registered with $email.\n',
                 style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey
+                color: Color.fromARGB(255, 76, 75, 75)
               ),
           ),
        Row(
@@ -207,7 +212,7 @@ class _Profile extends State<Profile>{
             SignOut,
           ],
         ),
-        const SizedBox(height: 15.0),
+        const SizedBox(height: 1.0),
       ],
     ),
   ),
