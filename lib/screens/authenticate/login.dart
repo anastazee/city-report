@@ -72,7 +72,7 @@ class _Login extends State<Login> {
     final register = Material(
       elevation: 0.0,
       borderRadius: BorderRadius.circular(5.0),
-      color: Color.fromARGB(255, 227, 186, 220),
+      color: Color.fromARGB(255, 232, 222, 255),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width * 0.1, // Adjust the factor to your liking
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 7.0),
@@ -126,10 +126,10 @@ class _Login extends State<Login> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 25.0),
+          const SizedBox(height: 30.0),
         Container(
-        color: Color.fromARGB(255, 228, 174, 219), // Set the desired color for the box
-        padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 30.0), // Add top padding
+        color: Color.fromARGB(255, 232, 222, 255), // Set the desired color for the box
+        padding: EdgeInsets.fromLTRB(25.0, 25.0, 25.0, 25.0), // Add top padding
         child: Text(
           'City \nReport',
           style: TextStyle(

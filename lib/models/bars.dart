@@ -9,7 +9,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-          icon: const Icon(Icons.circle_notifications),
+          icon: const Icon(Icons.circle_notifications, color: Color(0xFF21005D)),
           onPressed: () {
             Navigator.push(
             context,
@@ -23,7 +23,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Color.fromARGB(255, 232, 222, 255),
       actions: [
         IconButton(
-           icon: Icon(Icons.account_circle_rounded),
+           icon: Icon(Icons.account_circle_rounded, color: Color(0xFF21005D)),
            onPressed: () {
             Navigator.push(
             context,

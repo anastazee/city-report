@@ -250,12 +250,12 @@ child: RichText(
         text: ' Points: ',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
       ),
-      TextSpan(text: '$points \n\n'),
+      TextSpan(text: '$points \n'),
       TextSpan(
         text: ' Level: ',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
       ),
-      TextSpan(text: '$level \n\n'),
+      TextSpan(text: '$level \n'),
       TextSpan(
         text: ' Points to Next Level: ',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),

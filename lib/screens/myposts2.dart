@@ -240,6 +240,10 @@ class _MyPostsState extends State<MyPosts> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      width:
+                          8.0, // Add some spacing between the left edge and the content
+                    ),
                   ],
                 ),
               ),

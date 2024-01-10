@@ -223,6 +223,9 @@ Future<void> getUserLocation() async {
                         ),
                       ),
                     ),
+                    SizedBox(
+                            width: 8.0,
+                          ),
                         ],
                       ),
                     ),

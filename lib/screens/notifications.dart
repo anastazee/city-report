@@ -121,6 +121,9 @@ class _Notifications extends State<Notifications> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                            width: 8.0,
+                          ),
                         ],
                       ),
                     ),
