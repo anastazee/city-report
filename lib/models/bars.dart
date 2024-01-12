@@ -9,29 +9,28 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-          icon: const Icon(Icons.circle_notifications, color: Color(0xFF21005D)),
+          icon:
+              const Icon(Icons.circle_notifications, color: Color(0xFF21005D)),
           onPressed: () {
             Navigator.push(
-            context,
-            SwipeablePageRoute(builder: (context) => Notifications()),
-          );
+              context,
+              SwipeablePageRoute(builder: (context) => Notifications()),
+            );
           },
-          iconSize: 35.0
-        ),
+          iconSize: 35.0),
       title: Text('City Report'),
       centerTitle: true,
       backgroundColor: Color.fromARGB(255, 232, 222, 255),
       actions: [
         IconButton(
-           icon: Icon(Icons.account_circle_rounded, color: Color(0xFF21005D)),
-           onPressed: () {
-            Navigator.push(
-            context,
-            SwipeablePageRoute(builder: (context) => Profile()),
-          );
-          },
-          iconSize: 35.0
-       ),
+            icon: Icon(Icons.account_circle_rounded, color: Color(0xFF21005D)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                SwipeablePageRoute(builder: (context) => Profile()),
+              );
+            },
+            iconSize: 35.0),
       ],
     );
   }
@@ -40,13 +39,10 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-
 class AppNavigationBar extends StatelessWidget {
   final int selectedIndex;
 
-  AppNavigationBar({
-    required this.selectedIndex
-  });
+  AppNavigationBar({required this.selectedIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +60,11 @@ class AppNavigationBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, int index, IconData icon, String label) {
+  Widget _buildNavItem(
+      BuildContext context, int index, IconData icon, String label) {
     return GestureDetector(
       onTap: () {
-        //Vibration.vibrate();
+        Vibration.vibrate(duration: 20);
         // Handle navigation based on the selected index
         switch (index) {
           case 0:
@@ -84,19 +81,21 @@ class AppNavigationBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container( 
-            width: 60.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15.0), // Adjust the border radius as needed
-              shape: BoxShape.rectangle,
-              color: selectedIndex == index ? Color.fromARGB(255, 194, 185, 213) : Colors.transparent,
-            ),
-            child: Icon(
-              icon,
-              color: Color(0xFF21005D),
-              size: 30.0,
-            )
-          ),
+          Container(
+              width: 60.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    15.0), // Adjust the border radius as needed
+                shape: BoxShape.rectangle,
+                color: selectedIndex == index
+                    ? Color.fromARGB(255, 194, 185, 213)
+                    : Colors.transparent,
+              ),
+              child: Icon(
+                icon,
+                color: Color(0xFF21005D),
+                size: 30.0,
+              )),
           SizedBox(height: 4.0),
           Text(
             label,
