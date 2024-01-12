@@ -147,6 +147,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import './camerapage.dart'; // Import the CameraPage
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
 
 class NewIncident extends StatefulWidget {
   @override
@@ -163,13 +164,15 @@ class _NewIncidentState extends State<NewIncident> {
   Location location = Location();
   User? user = FirebaseAuth.instance.currentUser;
   String? _currentUsername;
-  String? _uid; 
+  String? _uid;
+  int _level = 0;
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     _getCurrentUsername();
+    _getLevel();
   }
 
   GeoPoint? _geoPointFromLocationData(LocationData? locationData) {
@@ -200,6 +203,28 @@ class _NewIncidentState extends State<NewIncident> {
       });
     } catch (e) {
       print('Error getting username: $e');
+    }
+  }
+
+  _getLevel() async {
+    try {
+      int level = await getLevelFromEmail(user?.email ?? '');
+      setState(() {
+        _level = level;
+      });
+    } catch (e) {
+      print('Error getting level: $e');
+    }
+  }
+
+  Future<void> _getImageFromGallery() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path;
+      });
     }
   }
 
@@ -260,10 +285,24 @@ class _NewIncidentState extends State<NewIncident> {
                   },
                   child: const Text('Take Picture'),
                 ),
+                Visibility(
+                  visible: _level >= 1,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      _getImageFromGallery();
+
+                      if (_imagePath != '') {
+                        setState(() {
+                          _imagePath = _imagePath;
+                        });
+                      }
+                    },
+                    child: const Text('Select from Gallery'),
+                  ),
+                ),
                 Column(
                   children: [
-                    if (_imagePath.isNotEmpty)
-                      SizedBox(height: 16.0),
+                    if (_imagePath.isNotEmpty) SizedBox(height: 16.0),
                     if (_imagePath.isNotEmpty)
                       Image.file(
                         File(_imagePath),
