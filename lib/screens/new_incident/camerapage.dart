@@ -164,6 +164,9 @@ class _CameraPageState extends State<CameraPage> {
                           await _uploadImage(File(_capturedImage.path));*/
                       Navigator.pop(context, _capturedImage.path);
                     }
+                    else {
+                      Navigator.pop(context, '');
+                    }
                   },
                   child: Text('Capture'),
                 ),

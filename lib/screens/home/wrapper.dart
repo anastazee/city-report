@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home.dart';
+import '/screens/map/mappage.dart';
 import '../authenticate/login.dart';
 
 class Wrapper extends StatelessWidget {
@@ -10,7 +11,7 @@ class Wrapper extends StatelessWidget {
 
     // If the user is logged in, show the home page
     if (user != null) {
-      return Home();
+      return MapPage();
     } else {
       // If the user is not logged in, show the login page
       return Login();

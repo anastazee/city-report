@@ -243,13 +243,24 @@ Future<void> getUserLocation() async {
 
 
   Widget _buildSortButton() {
-    return FloatingActionButton(
+  return ButtonTheme(
+    minWidth: 0, // Set to 0 to enable dynamic sizing based on child content
+    height: 50.0, // Set the desired height
+    child: MaterialButton(
       onPressed: () {
         _showSortOptions();
       },
+      color: Colors.deepPurple[50],
+      textColor: Color(0xFF21005D), // Set the text color
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+      ),
       child: Text("Sort by"),
-    );
-  }
+    ),
+  );
+}
+
+
 
   void _showSortOptions() {
     showModalBottomSheet(

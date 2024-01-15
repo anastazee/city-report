@@ -16,7 +16,6 @@ class Notifications extends StatefulWidget {
 }
 
 class _Notifications extends State<Notifications> {
-
   User? user = FirebaseAuth.instance.currentUser;
   @override
   void initState() {
@@ -31,8 +30,8 @@ class _Notifications extends State<Notifications> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('recent')
-            .where('uid',
-                isEqualTo: user!.uid.toString() ?? '').snapshots(),
+            .where('uid', isEqualTo: user!.uid.toString() ?? '')
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
@@ -47,20 +46,28 @@ class _Notifications extends State<Notifications> {
             itemBuilder: (context, index) {
               return FutureBuilder(
                 future: fetchIncidentData(incidents[index]),
-                builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
-                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                builder: (context,
+                    AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
                   var data = asyncSnapshot.data!;
-                  var title = data['title'] ?? '';
+                  var title = (data['title'] ?? '').toString();
+
+                  if (title.length > 18) {
+                    title = title.substring(0, 18) + '...';
+                  }
+
                   var likes = data['likes'];
                   var dislikes = data['dislikes'];
-                 
+
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 20.0),
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: 75.0,
@@ -81,47 +88,52 @@ class _Notifications extends State<Notifications> {
                               children: [
                                 Text(
                                   'Your post $title got',
-                                  style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal),
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
                                 Text(
                                   '$likes Likes & $dislikes Dislikes.',
-                                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
                           ),
                           Spacer(),
-                      Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: 33.75,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF6750A4),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5.0), // Add padding to the right
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                SwipeablePageRoute(
-                                  builder: (context) => IncidentDetails(
-                                    documentId: incidents[index].id,
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: 33.75,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF6750A4),
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5.0), // Add padding to the right
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      SwipeablePageRoute(
+                                        builder: (context) => IncidentDetails(
+                                          documentId: incidents[index].id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'More',
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                              );
-                            },
-                            child: Text(
-                              'More',
-                              style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
+                          SizedBox(
                             width: 8.0,
                           ),
                         ],
@@ -137,7 +149,6 @@ class _Notifications extends State<Notifications> {
       bottomNavigationBar: AppNavigationBar(selectedIndex: -1),
     );
   }
-  
 
   Future<Map<String, dynamic>> fetchDocumentData(
       DocumentSnapshot document) async {
@@ -153,10 +164,9 @@ class _Notifications extends State<Notifications> {
     });
   }
 
-    Future<Map<String, dynamic>> fetchIncidentData(DocumentSnapshot document) async {
+  Future<Map<String, dynamic>> fetchIncidentData(
+      DocumentSnapshot document) async {
     var documentSnapshot = await document.reference.get();
     return documentSnapshot.data() as Map<String, dynamic>;
   }
-
-  
 }

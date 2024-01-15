@@ -22,22 +22,46 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.moveOldIncidents = functions.pubsub.schedule('0 */3 * * *').timeZone('UTC').onRun(async (context) => {
-  const thirtySixHoursAgo = new Date();
-  thirtySixHoursAgo.setHours(thirtySixHoursAgo.getHours() - 36);
-  const recentSnapshot = await admin.firestore().collection('recent').where('datetime', '<', thirtySixHoursAgo).get();
+exports.moveOldIncidents = functions.pubsub.schedule('every 2 minutes').timeZone('UTC').onRun(async (context) => {
+  try {
+    const thirtySixHoursAgo = new Date();
+    thirtySixHoursAgo.setHours(thirtySixHoursAgo.getHours() - 36);
+    const recentSnapshot = await admin.firestore().collection('recent').where('datetime', '<', thirtySixHoursAgo).get();
 
-  const batch = admin.firestore().batch(
-  );
+    const batch = admin.firestore().batch();
+    let userPointsToUpdate = {}; // To accumulate points for each user
 
-  recentSnapshot.forEach((doc) => {
-    const data = doc.data();
-    batch.set(admin.firestore().collection('incidents').doc(doc.id), data);
-    batch.delete(doc.ref);
-  });
+    recentSnapshot.forEach((doc) => {
+      const data = doc.data();
 
-  await batch.commit();
+      const userId = data.uid;
+      const likes = data.likes || 0;
+      const dislikes = data.dislikes || 0;
+      if (!userPointsToUpdate[userId]) {
+        userPointsToUpdate[userId] = 0;
+      }
 
-  return null;
+      userPointsToUpdate[userId] += (likes - dislikes);
+
+      batch.set(admin.firestore().collection('incidents').doc(doc.id), data);
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    const usersCollection = admin.firestore().collection('users');
+    const updatePromises = Object.entries(userPointsToUpdate).map(async ([userId, points2]) => {
+      const userDocRef = usersCollection.doc(userId);
+      await userDocRef.update({ points: admin.firestore.FieldValue.increment(points2) });
+      console.log(`User ${userId} points updated by ${points2}`);
+    });
+
+    // Wait for all user updates to complete before returning
+    await Promise.all(updatePromises);
+
+    return null;
+  } catch (error) {
+    console.error('Error in moveOldIncidents function:', error);
+    return null;
+  }
 });
-

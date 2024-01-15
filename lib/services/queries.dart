@@ -28,7 +28,7 @@ Future<int> getLevelFromEmail(String email) async {
 
     if (querySnapshot.docs.isNotEmpty) {
       int points = querySnapshot.docs.first['points'] as int;
-      int level = points % 10;
+      int level = points ~/ 10;
       return level;
     }
   } catch (e) {
