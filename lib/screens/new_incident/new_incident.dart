@@ -191,9 +191,10 @@ class _NewIncidentState extends State<NewIncident> {
     try {
       var currentLocation = await location.getLocation();
       if (mounted) {
-      setState(() {
-        _currentLocation = _geoPointFromLocationData(currentLocation);
-      });}
+        setState(() {
+          _currentLocation = _geoPointFromLocationData(currentLocation);
+        });
+      }
     } catch (e) {
       print('Error getting location: $e');
     }
@@ -282,10 +283,14 @@ class _NewIncidentState extends State<NewIncident> {
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () async {
+                    final cameras = await availableCameras();
+
                     _helper = await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CameraPage()),
+                      MaterialPageRoute(
+                          builder: (context) => CameraPage(cameras: cameras)),
                     );
+
                     _imagePath = _helper ?? '';
                     if (_imagePath != '') {
                       setState(() {
@@ -347,43 +352,47 @@ class _NewIncidentState extends State<NewIncident> {
                 ),
                 ElevatedButton(
                   onPressed: _imagePath.isNotEmpty
-      ? () async {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      if (_imagePath != '') {
-                        String? imageURL = await uploadImage(File(_imagePath));
-                        IncidentDetails incidentDetails = IncidentDetails(
-                          datetime: Timestamp.now(),
-                          description: _incidentDescriptionController.text,
-                          location: _currentLocation,
-                          title: _incidentTitleController.text,
-                          username: _currentUsername,
-                          imageURL: imageURL,
-                        );
+                      ? () async {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            if (_imagePath != '') {
+                              String? imageURL =
+                                  await uploadImage(File(_imagePath));
+                              IncidentDetails incidentDetails = IncidentDetails(
+                                datetime: Timestamp.now(),
+                                description:
+                                    _incidentDescriptionController.text,
+                                location: _currentLocation,
+                                title: _incidentTitleController.text,
+                                username: _currentUsername,
+                                imageURL: imageURL,
+                              );
 
-                        print('Image URL: ${incidentDetails.imageURL}');
-                        await FirebaseFirestore.instance
-                            .collection('recent')
-                            .add({
-                          'datetime': incidentDetails.datetime,
-                          'description': incidentDetails.description,
-                          'location': incidentDetails.location,
-                          'title': incidentDetails.title,
-                          'username': incidentDetails.username,
-                          'likes': 0,
-                          'dislikes': 0,
-                          'imageURL': incidentDetails.imageURL,
-                          'uid': _uid,
-                        });
+                              print('Image URL: ${incidentDetails.imageURL}');
+                              await FirebaseFirestore.instance
+                                  .collection('recent')
+                                  .add({
+                                'datetime': incidentDetails.datetime,
+                                'description': incidentDetails.description,
+                                'location': incidentDetails.location,
+                                'title': incidentDetails.title,
+                                'username': incidentDetails.username,
+                                'likes': 0,
+                                'dislikes': 0,
+                                'imageURL': incidentDetails.imageURL,
+                                'uid': _uid,
+                              });
 
-                        // Reset the image file after adding the incident
-                        setState(() {
-                          _imagePath = '';
-                        });
-                      }
+                              // Reset the image file after adding the incident
+                              setState(() {
+                                _imagePath = '';
+                              });
+                            }
 
-                      Navigator.pop(context); // Go back to the previous page
-                    }
-                  } : null,
+                            Navigator.pop(
+                                context); // Go back to the previous page
+                          }
+                        }
+                      : null,
                   child: const Text('Add Incident'),
                 ),
               ],

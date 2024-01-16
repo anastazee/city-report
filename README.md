@@ -1,16 +1,7 @@
-# flutter_application_1
+## City Report
 
-A new Flutter project.
+This is our team's repo with our Flutter (using Dart) project for the 2023-2024 ECE NTUA class Αλληλεπίδραση Ανθρώπου - Υπολογιστή (Human-Computer Interaction).
+The interface was designed following closely the Figma Prototypes we created for the project's second phase.
+Storing the data, making queries on them and user authentication are performed via Firebase.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Feel free to explore the `/lib` directory for the core implementation of the project.

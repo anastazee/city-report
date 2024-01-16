@@ -58,8 +58,8 @@ class _Notifications extends State<Notifications> {
                   var data = asyncSnapshot.data!;
                   var title = (data['title'] ?? '').toString();
 
-                  if (title.length > 18) {
-                    title = title.substring(0, 18) + '...';
+                  if (title.length > 15) {
+                    title = title.substring(0, 15) + '...';
                   }
 
                   var likes = data['likes'];

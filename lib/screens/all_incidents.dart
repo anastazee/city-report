@@ -88,21 +88,60 @@ class _AllIncidentsState extends State<AllIncidents> {
     getUserLocation();
   }
 
-Future<void> getUserLocation() async {
-  try {
-    Position position = await Geolocator.getCurrentPosition();
-    if (mounted) {
-      setState(() {
-        userLocation = position;
-      });
+  Future<void> getUserLocation() async {
+    
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Location Service Disabled'),
+          content: Text('Please enable location services.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
     }
-  } catch (e) {
-    print("Error getting user's location: $e");
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Location Permission Denied'),
+            content: Text('Please grant location permission.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      if (mounted) {
+        setState(() {
+          userLocation = position;
+        });
+      }
+    } catch (e) {
+      print("Error getting user's location: $e");
+    }
   }
-}
 
-
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(),
@@ -117,36 +156,43 @@ Future<void> getUserLocation() async {
 
           var incidents = snapshot.data!.docs;
 
-          sortByProximity
-              ? sortIncidentsByProximity(incidents)
-              : sortIncidentsByDateTime(incidents);
-
+          if (sortByProximity) {
+              sortIncidentsByProximity(incidents);}
+          else { sortIncidentsByDateTime(incidents);
+          }
           return ListView.builder(
             itemCount: incidents.length,
             itemBuilder: (context, index) {
               return FutureBuilder(
                 future: fetchIncidentData(incidents[index]),
-                builder: (context, AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
-                  if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                builder: (context,
+                    AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(),
                     );
                   }
 
                   var data = asyncSnapshot.data!;
-                  var title = data['title'] ?? '';
+                  var title = (data['title'] ?? '').toString();
+                  title = title.length > 22
+                      ? title.substring(0, 22) + '...'
+                      : title;
                   var docid = incidents[index].id;
                   var timestamp = data['datetime'] as Timestamp;
                   var datetime = timestamp.toDate();
-                  String formattedDateTime = DateFormat('yyyy-MM-dd HH:mm').format(datetime);
+                  String formattedDateTime =
+                      DateFormat('yyyy-MM-dd HH:mm').format(datetime);
 
                   var proximity = '';
                   if (sortByProximity) {
                     var geopoint = data['location'] as GeoPoint?;
-                    var incidentLocation =
-                        geopoint != null ? Location1(geopoint.latitude, geopoint.longitude) : null;
+                    var incidentLocation = geopoint != null
+                        ? Location1(geopoint.latitude, geopoint.longitude)
+                        : null;
 
-                    if (incidentLocation != null) {
+                    if (incidentLocation != null && userLocation != null) {
                       var distance = Geolocator.distanceBetween(
                         userLocation!.latitude,
                         userLocation!.longitude,
@@ -154,14 +200,16 @@ Future<void> getUserLocation() async {
                         incidentLocation.longitude,
                       );
 
-                      proximity = '${(distance/1000).toStringAsFixed(2)} km away';
+                      proximity =
+                          '${(distance / 1000).toStringAsFixed(2)} km away';
                     } else {
                       proximity = 'Proximity: N/A';
                     }
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 20.0),
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.8,
                       height: 90.0,
@@ -182,48 +230,54 @@ Future<void> getUserLocation() async {
                               children: [
                                 Text(
                                   '$title',
-                                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   '$formattedDateTime',
                                   style: TextStyle(fontSize: 14.0),
                                 ),
-                                if (sortByProximity) Text(proximity,style: TextStyle(fontSize: 12.0),),
+                                if (sortByProximity)
+                                  Text(
+                                    proximity,
+                                    style: TextStyle(fontSize: 12.0),
+                                  ),
                               ],
                             ),
                           ),
                           Spacer(),
                           Container(
-                      width: 60.0,
-                      height: 33.75,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF6750A4),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5.0), // Add padding to the right
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                SwipeablePageRoute(
-                                  builder: (context) => IncidentDetails(
-                                    documentId: incidents[index].id,
+                            width: 60.0,
+                            height: 33.75,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF6750A4),
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5.0), // Add padding to the right
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      SwipeablePageRoute(
+                                        builder: (context) => IncidentDetails(
+                                          documentId: incidents[index].id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'More',
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                              );
-                            },
-                            child: Text(
-                              'More',
-                              style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
+                          SizedBox(
                             width: 8.0,
                           ),
                         ],
@@ -241,26 +295,24 @@ Future<void> getUserLocation() async {
     );
   }
 
-
   Widget _buildSortButton() {
-  return ButtonTheme(
-    minWidth: 0, // Set to 0 to enable dynamic sizing based on child content
-    height: 50.0, // Set the desired height
-    child: MaterialButton(
-      onPressed: () {
-        _showSortOptions();
-      },
-      color: Colors.deepPurple[50],
-      textColor: Color(0xFF21005D), // Set the text color
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+    return ButtonTheme(
+      minWidth: 0, // Set to 0 to enable dynamic sizing based on child content
+      height: 50.0, // Set the desired height
+      child: MaterialButton(
+        onPressed: () {
+          _showSortOptions();
+        },
+        color: Colors.deepPurple[50],
+        textColor: Color(0xFF21005D), // Set the text color
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(10.0), // Adjust the radius as needed
+        ),
+        child: Text("Sort by"),
       ),
-      child: Text("Sort by"),
-    ),
-  );
-}
-
-
+    );
+  }
 
   void _showSortOptions() {
     showModalBottomSheet(
@@ -296,7 +348,8 @@ Future<void> getUserLocation() async {
     );
   }
 
-  Future<Map<String, dynamic>> fetchIncidentData(DocumentSnapshot document) async {
+  Future<Map<String, dynamic>> fetchIncidentData(
+      DocumentSnapshot document) async {
     var documentSnapshot = await document.reference.get();
     return documentSnapshot.data() as Map<String, dynamic>;
   }
@@ -309,15 +362,18 @@ Future<void> getUserLocation() async {
     });
   }
 
-
   void sortIncidentsByProximity(List<DocumentSnapshot> incidents) {
     if (userLocation != null) {
       incidents.sort((a, b) {
         var geopointA = (a['location'] as GeoPoint?);
-        var incidentLocationA = geopointA != null ? Location1(geopointA.latitude, geopointA.longitude) : null;
+        var incidentLocationA = geopointA != null
+            ? Location1(geopointA.latitude, geopointA.longitude)
+            : null;
 
         var geopointB = (b['location'] as GeoPoint?);
-        var incidentLocationB = geopointB != null ? Location1(geopointB.latitude, geopointB.longitude) : null;
+        var incidentLocationB = geopointB != null
+            ? Location1(geopointB.latitude, geopointB.longitude)
+            : null;
 
         // Handle cases where location is null
         if (incidentLocationA == null && incidentLocationB == null) {
@@ -345,7 +401,6 @@ Future<void> getUserLocation() async {
 
         return distanceA.compareTo(distanceB);
       });
-
     }
   }
 }

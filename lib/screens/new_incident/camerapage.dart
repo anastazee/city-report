@@ -86,8 +86,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
+
 class CameraPage extends StatefulWidget {
-  const CameraPage({Key? key}) : super(key: key);
+  final List<CameraDescription> cameras;
+
+  const CameraPage({required this.cameras, Key? key}) : super(key: key);
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -105,9 +108,8 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   Future<void> initializeCamera() async {
-    final cameras = await availableCameras();
     _cameraController = CameraController(
-      cameras[0], // Use the first available camera
+      widget.cameras[0], // Use the first available camera
       ResolutionPreset.medium,
     );
 
@@ -116,6 +118,7 @@ class _CameraPageState extends State<CameraPage> {
       setState(() {});
     }
   }
+
 
   Future<void> _onCapturePressed() async {
     try {
@@ -142,7 +145,9 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     if (!_cameraController.value.isInitialized) {
-      return Container(); // You might want to show a loading indicator here
+      return Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
     return Scaffold(

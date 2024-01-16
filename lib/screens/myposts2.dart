@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
+
 class MyPosts extends StatefulWidget {
   @override
   _MyPostsState createState() => _MyPostsState();
@@ -63,15 +64,13 @@ class _MyPostsState extends State<MyPosts> {
     final Stream<QuerySnapshot<Map<String, dynamic>>> incidentsStream =
         FirebaseFirestore.instance
             .collection('incidents')
-            .where('uid',
-                isEqualTo: user!.uid.toString() ?? '')
+            .where('uid', isEqualTo: user!.uid.toString() ?? '')
             .snapshots();
 
     final Stream<QuerySnapshot<Map<String, dynamic>>> recentStream =
         FirebaseFirestore.instance
             .collection('recent')
-            .where('uid',
-                isEqualTo: user!.uid.toString().toString() ?? '')
+            .where('uid', isEqualTo: user!.uid.toString().toString() ?? '')
             .snapshots();
 
     final mergedStream = Rx.combineLatest2(
@@ -106,7 +105,8 @@ class _MyPostsState extends State<MyPosts> {
               padding: const EdgeInsets.symmetric(
                   vertical: 10.0, horizontal: 20.0), // Adjust vertical padding
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.8, // Adjust the overall width of the list tiles
+                width: MediaQuery.of(context).size.width *
+                    0.8, // Adjust the overall width of the list tiles
                 height: 75.0,
                 decoration: BoxDecoration(
                   color: Color(0xFFF7F2FA),
@@ -126,17 +126,22 @@ class _MyPostsState extends State<MyPosts> {
                             AsyncSnapshot<Map<String, dynamic>> asyncSnapshot) {
                           if (asyncSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(child: SizedBox(
-                    width: 40.0,
-                    height: 40.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ),);
+                            return Center(
+                              child: SizedBox(
+                                width: 40.0,
+                                height: 40.0,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                              ),
+                            );
                           }
 
                           var data = asyncSnapshot.data!;
-                          var title = data['title'] ?? '';
+                          var title = (data['title'] ?? '').toString();
+                          title = title.length > 20
+                              ? title.substring(0, 20) + '...'
+                              : title;
                           var timestamp = data['datetime'] as Timestamp;
                           var datetime = timestamp.toDate();
                           String formattedDateTime =
@@ -207,9 +212,10 @@ class _MyPostsState extends State<MyPosts> {
                           ),
                         ),
                       )
-                      else Padding(
-                      padding: const EdgeInsets.all(25.0),
-                    ),
+                    else
+                      Padding(
+                        padding: const EdgeInsets.all(25.0),
+                      ),
                     Container(
                       width: 60.0,
                       height: 33.75,
@@ -286,4 +292,3 @@ class _MyPostsState extends State<MyPosts> {
     }
   }
 }
-
