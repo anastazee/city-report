@@ -33,8 +33,18 @@ class _IncidentDetailsState extends State<IncidentDetails> {
   void initState() {
     super.initState();
     _getCurrentUsername();
-    fetchData(user?.uid);
+    _loadIncidentData();
   }
+
+  Future<void> _loadIncidentData() async {
+  try {
+    DocumentSnapshot<Map<String, dynamic>> incidentSnapshot =
+        await _getIncidentDocument();
+    fetchData(incidentSnapshot.data()?['uid']);
+  } catch (e) {
+    print('Error loading incident data: $e');
+  }
+}
 
   Future<void> fetchData(String? userId) async {
     try {
@@ -86,9 +96,11 @@ class _IncidentDetailsState extends State<IncidentDetails> {
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: _getIncidentDocument(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting || isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
+          if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.connectionState == ConnectionState.active || isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+
 
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -114,7 +126,10 @@ class _IncidentDetailsState extends State<IncidentDetails> {
 
           likes = initialLikes;
           dislikes = initialDislikes;
-
+          String? userId = incidentData['uid'];
+          
+          //fetchData(userId);
+          
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -138,33 +153,34 @@ class _IncidentDetailsState extends State<IncidentDetails> {
                     '$formattedDateTime',
                     style: TextStyle(fontSize: 20.0),
                   ),
-                  Row(children: [if (incidentData['username'] != null) ...[
-                    SizedBox(height: 8.0),
-                    Text(
-                      '@${incidentData['username']}',
-                      style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey[850],
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 8.0),
-                    // Display user level as a badge
-                    points != null
-                        ? buildLevelBadge(points! ~/ 10)
-                        : CircularProgressIndicator(),],]),
-
-                    SizedBox(height: 8.0),
-                    Text(
-                      'Short Description:',
-                      style: TextStyle(
-                          fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      '${incidentData['description']}',
-                      style: TextStyle(fontSize: 16.0, color: Colors.grey[850]),
-                    ),
-                  
+                  Row(children: [
+                    if (incidentData['username'] != null) ...[
+                      SizedBox(height: 8.0),
+                      Text(
+                        '@${incidentData['username']}',
+                        style: TextStyle(
+                            fontSize: 20.0,
+                            color: Colors.grey[850],
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 8.0),
+                      // Display user level as a badge
+                      points != null
+                          ? buildLevelBadge(points! ~/ 10)
+                          : CircularProgressIndicator(),
+                    ],
+                  ]),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Short Description:',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 4.0),
+                  Text(
+                    '${incidentData['description']}',
+                    style: TextStyle(fontSize: 16.0, color: Colors.grey[850]),
+                  ),
                   if (incidentData['imageURL'] != null) ...[
                     SizedBox(height: 16.0),
                     Text(
@@ -254,7 +270,6 @@ class _IncidentDetailsState extends State<IncidentDetails> {
             .doc(widget.documentId)
             .get();
       }
-
       return incidentSnapshot;
     } catch (e) {
       print('Error getting incident document: $e');
@@ -388,7 +403,9 @@ Color mapLevelToColor(int level) {
   // Example: Assuming you want to create a color gradient from low to high levels
   // You can adjust the colors based on your design preference
   double factor = level / 5.0; // Assuming the maximum level is 5
-  return Color.lerp(Color.fromARGB(255, 132, 226, 177), Color.fromARGB(255, 68, 0, 186), factor) ?? Colors.yellow;
+  return Color.lerp(Color.fromARGB(255, 132, 226, 177),
+          Color.fromARGB(255, 68, 0, 186), factor) ??
+      Colors.yellow;
 }
 
 Widget buildLevelBadge(int level) {
@@ -408,18 +425,14 @@ Widget buildLevelBadge(int level) {
     ),
     child: Text(
       '$level',
-            style: TextStyle(
+      style: TextStyle(
         fontSize: 14.0, // Increase the font size for a more impressive look
         fontWeight: FontWeight.bold, // Make the text bold
         color: Colors.white,
       ),
-
     ),
-
   );
 }
-
-
 
 Future<int?> fetchUserPoints(String? userId) async {
   try {
@@ -441,3 +454,4 @@ Future<int?> fetchUserPoints(String? userId) async {
     return null; // Return null or a default value based on your use case
   }
 }
+

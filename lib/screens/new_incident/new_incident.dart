@@ -190,9 +190,10 @@ class _NewIncidentState extends State<NewIncident> {
   _getCurrentLocation() async {
     try {
       var currentLocation = await location.getLocation();
+      if (mounted) {
       setState(() {
         _currentLocation = _geoPointFromLocationData(currentLocation);
-      });
+      });}
     } catch (e) {
       print('Error getting location: $e');
     }

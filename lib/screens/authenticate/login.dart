@@ -1,4 +1,5 @@
 import 'package:flutter_application_1/models/loginuser.dart';
+import 'package:flutter_application_1/screens/map/mappage.dart';
 import 'package:flutter_application_1/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../home/home.dart';
@@ -99,7 +100,7 @@ class _Login extends State<Login> {
             if (result != null && result.uid != null) { // Successful authentication
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => Home()), 
+                MaterialPageRoute(builder: (context) => MapPage()), 
               );
             } else {
               showDialog(

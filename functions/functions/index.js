@@ -22,7 +22,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.moveOldIncidents = functions.pubsub.schedule('every 2 minutes').timeZone('UTC').onRun(async (context) => {
+exports.moveOldIncidents = functions.pubsub.schedule('every 2 hours').timeZone('UTC').onRun(async (context) => {
   try {
     const thirtySixHoursAgo = new Date();
     thirtySixHoursAgo.setHours(thirtySixHoursAgo.getHours() - 36);
