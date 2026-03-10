@@ -1,7 +1,19 @@
-## City Report
+# City Report 
+**Community-Driven Incident Reporting Mobile App** 
 
-This is our team's repo with our Flutter (using Dart) project for the 2023-2024 ECE NTUA class Αλληλεπίδραση Ανθρώπου - Υπολογιστή (Human-Computer Interaction).
-The interface was designed following closely the Figma Prototypes we created for the project's second phase.
-Storing the data, making queries on them and user authentication are performed via Firebase.
+*Developed for the Human-Computer Interaction (HCI) Course (2023-2024) @ ECE NTUA*
 
+City Report is an Android mobile app designed to bridge the gap between citizens and urban maintenance. Users can report local incidents (closed roads, potholes, broken streetlights, etc.) in real-time, attach photographic evidence, and view a live map of reported issues in their vicinity.
+
+
+### Tech Stack
+* **Framework:** Flutter (Dart)
+* **Backend-as-a-Service:** Firebase
+* **Design Tools:** Figma (for UI/UX prototyping)
+  
 Feel free to explore the `/lib` directory for the core implementation of the project.
+
+### Prerequisites
+* Flutter SDK installed.
+* Firebase Project set up with `google-services.json` (Android).
+
